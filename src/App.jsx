@@ -1,8 +1,8 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import "./App.css";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorFallback from "./components/ErrorBoundary";
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect } from "react";
 import Loader from "./components/Loader";
 import { UserState } from "./context/user-context";
 const AuthPage = React.lazy(() => import("./pages/auth"));
@@ -16,6 +16,13 @@ const VendorPage = React.lazy(() => import("./pages/vendor-page"));
 const CutomerPage = React.lazy(() => import("./pages/customer-page"));
 function App() {
   const { user } = UserState();
+  const navigate = useNavigate();
+
+  useEffect(()=>{
+    if(user){
+      navigate('/home')
+    }
+  },[navigate, user])
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback} onReset={() => {}}>
