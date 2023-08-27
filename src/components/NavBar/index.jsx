@@ -60,7 +60,8 @@ const MenuItem = ({ children, to = "/", ...rest }) => {
 const MenuLinks = ({ isOpen }) => {
   const navigate = useNavigate();
   const logouthandler = () => {
-    localStorage.removeItem("userInfo");
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
     navigate("/");
   };
 
