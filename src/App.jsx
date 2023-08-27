@@ -1,4 +1,4 @@
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import "./App.css";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorFallback from "./components/ErrorBoundary";
@@ -17,12 +17,12 @@ const CutomerPage = React.lazy(() => import("./pages/customer-page"));
 function App() {
   const { user } = UserState();
   const navigate = useNavigate();
-
+  const {pathname} = useLocation();
   useEffect(()=>{
-    if(user){
+    if(user && pathname == "/"){
       navigate('/home')
     }
-  },[navigate, user])
+  },[navigate, pathname, user])
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback} onReset={() => {}}>
