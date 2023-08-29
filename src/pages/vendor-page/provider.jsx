@@ -184,7 +184,7 @@ function useVendorPage() {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, page, fetchList, activeTab]);
+  }, [user, page, fetchList, activeTab,searchTerm]);
 
   return useMemo(() => {
     return {
