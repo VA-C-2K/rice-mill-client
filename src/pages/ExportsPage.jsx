@@ -6,9 +6,13 @@ const Cutomer = React.lazy(() => import("./customer-page"));
 
 const ExportsPage = () => {
   const { activeTab, setActiveTab, setFetchList, setSearchTerm, setPage } = GlobalState();
-  if(activeTab === "" && activeTab !== "Customer" && activeTab !== "Sales") {
+  if(activeTab === "") {
     setActiveTab("Customer");
-  } 
+  }else if([...Const.IMPORT_PAGES,...Const.HOME_PAGES].includes(activeTab)){
+    setActiveTab("Customer");
+  }else if(!Const.EXPORT_PAGES.includes(activeTab)){
+    setActiveTab("Customer");
+  }
   const handleTabChange = (index) => {
     setActiveTab(Const.EXPORT_PAGES[index]);
     setFetchList(0);

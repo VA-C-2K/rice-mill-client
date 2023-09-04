@@ -3,11 +3,18 @@ import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { GlobalState } from "../context/global-context";
 import Const from "../constants";
 const Vendor = React.lazy(() => import("./vendor-page"));
+const Vehicle = React.lazy(() => import("./vehicle-page"));
 const Product = React.lazy(() => import("./product-page"));
 
 const ImportsPage = () => {
   const { activeTab, setActiveTab, setFetchList, setSearchTerm, setPage } = GlobalState();
-  if(activeTab === "" && activeTab !== "Vendor" && activeTab !== "Vehicle" && activeTab !== "Products" && activeTab !== "Row Material Entry") {
+  if (activeTab === "") {
+    setActiveTab("Vendor");
+  } else if (
+    [...Const.HOME_PAGES, ...Const.EXPORT_PAGES].includes(activeTab)
+  ) {
+    setActiveTab("Vendor");
+  } else if (!Const.IMPORT_PAGES.includes(activeTab)) {
     setActiveTab("Vendor");
   }
   const handleTabChange = (index) => {
@@ -34,6 +41,9 @@ const ImportsPage = () => {
         </TabPanel>
         <TabPanel>
           <Product />
+        </TabPanel>
+        <TabPanel>
+          <Vehicle />
         </TabPanel>
       </TabPanels>
     </Tabs>

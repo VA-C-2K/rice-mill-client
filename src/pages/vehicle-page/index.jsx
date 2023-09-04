@@ -2,14 +2,14 @@
 import React, { useState } from "react";
 import { getInitialValues, getValidation } from "./form-helper";
 import { Formik } from "formik";
-import { EmployeePageProvider, useEmployeePageContext } from "./provider";
+import { VehiclePageProvider, useVehiclePageContext } from "./provider";
 import withHOC from "../../utils/with-hoc";
 import { useDisclosure } from "@chakra-ui/react";
 const FormContainer = React.lazy(() => import("./form-container"));
-const EmployeeTable = React.lazy(() => import("./emp-table"));
+const VehicleTable = React.lazy(() => import("./vehicle-table"));
 
-const Employee = () => {
-  const { handleCreate, handleUpdate } = useEmployeePageContext();
+const Vehicle = () => {
+  const { handleCreate, handleUpdate } = useVehiclePageContext();
   const [isUpdate, setIsUpdate] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
@@ -30,7 +30,7 @@ const Employee = () => {
         {(formik) => (
           <>
             <FormContainer isUpdate={isUpdate} setIsUpdate={setIsUpdate} formik={formik} isOpen={isOpen} onOpen={onOpen} onClose={onClose} />
-            <EmployeeTable isUpdate={isUpdate} setIsUpdate={setIsUpdate} formik={formik} />
+            <VehicleTable isUpdate={isUpdate} setIsUpdate={setIsUpdate} formik={formik} />
           </>
         )}
       </Formik>
@@ -38,4 +38,4 @@ const Employee = () => {
   );
 };
 
-export default withHOC(EmployeePageProvider, Employee);
+export default withHOC(VehiclePageProvider, Vehicle);
