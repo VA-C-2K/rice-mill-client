@@ -38,14 +38,14 @@ const VehicleTable = (props) => {
                 {" "}
                 <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
                   {" "}
-                  Name
+                  Driver Name
                 </Text>
               </Th>
               <Th w={"2xs"}>
                 {" "}
                 <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
                   {" "}
-                  Phone No.{" "}
+                  Driver Phone No.{" "}
                 </Text>
               </Th>
               <Th></Th>
