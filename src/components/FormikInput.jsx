@@ -13,21 +13,23 @@ const FormikInput = ({ label, children, type, ...props }) => {
   const { lableColor = "#40513B" } = props;
 
   const inputComponent =
-  type === 'select' ? (
-    <Select {...field} {...props}>
-      {children}
-    </Select>
-  ) : (
-    <Input {...field} {...props} />
-  );
+    type === 'select' ? (
+      <Select {...field} {...props}>
+        {children}
+      </Select>
+    ) : type === 'date' ? (
+      <Input {...field} {...props} type="date"/>
+    ) : (
+      <Input {...field} {...props} />
+    );
 
-return (
-  <FormControl isInvalid={meta.error && meta.touched}>
-    <FormLabel color={lableColor}>{label}</FormLabel>
-    <InputGroup>{inputComponent}</InputGroup>
-    <FormErrorMessage>{meta.error}</FormErrorMessage>
-  </FormControl>
-);
+  return (
+    <FormControl isInvalid={meta.error && meta.touched}>
+      <FormLabel color={lableColor}>{label}</FormLabel>
+      <InputGroup>{inputComponent}</InputGroup>
+      <FormErrorMessage>{meta.error}</FormErrorMessage>
+    </FormControl>
+  );
 };
 
 export default FormikInput;

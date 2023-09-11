@@ -1,20 +1,21 @@
-/* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react/prop-types */
+/* eslint-disable react-refresh/only-export-components */
 import { Box, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
 import CustomButton from "../../components/CustomButton";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import { capitalizedString } from "../../utils/string-helper";
-import { useCustomerPageContext, CustomerPageProvider } from "./provider";
+import { RowMaterialPageProvider, useRowMaterialPageContext } from "./provider";
 import withHOC from "../../utils/with-hoc";
 import TableSkeleton from "../../components/Skeleton";
+import { capitalizedString } from "../../utils/string-helper";
+import { getFormattedDateforUI } from "../../utils/date";
 
-const CustomerTable = (props) => {
-  const { customerList, handleUpdateClick, handleDelete, loading } = useCustomerPageContext();
+const RowTable = (props) => {
+  const { rowMaterialList, handleUpdateClick, handleDelete, loading } = useRowMaterialPageContext();
   const { isUpdate, setIsUpdate, formik } = props;
   if (loading) {
     return <TableSkeleton NoRecordFound={false} />;
   }
-  if (customerList?.customers?.length === 0) {
+  if (rowMaterialList?.row_materials?.length === 0) {
     return <TableSkeleton NoRecordFound={true} />;
   }
   return (
@@ -28,32 +29,53 @@ const CustomerTable = (props) => {
                   No.
                 </Text>
               </Th>
-              <Th w={"lg"}>
+              <Th w={"xs"}>
                 {" "}
                 <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
                   {" "}
-                  Name
-                </Text>
-              </Th>
-              <Th w={"lg"}>
-                {" "}
-                <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
-                  {" "}
-                  Address{" "}
-                </Text>
-              </Th>
-              <Th w={"2xs"}>
-                {" "}
-                <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
-                  {" "}
-                  Phone No.{" "}
+                  Type of Material
                 </Text>
               </Th>
               <Th w={"xs"}>
                 {" "}
                 <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
                   {" "}
-                  Govt/ Cust{" "}
+                  Buying Price{" "}
+                </Text>
+              </Th>
+              <Th w={"xs"}>
+                <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
+                  Quantity
+                </Text>
+              </Th>
+              <Th w={"xs"}>
+                <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
+                  Date
+                </Text>
+              </Th>
+              <Th w={"xs"}>
+                <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
+                  MRM Paid Amount
+                </Text>
+              </Th>
+              <Th w={"xs"}>
+                <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
+                  Remaining Amount
+                </Text>
+              </Th>
+              <Th w={"xs"}>
+                <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
+                  Next Due on
+                </Text>
+              </Th>
+              <Th w={"xs"}>
+                <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
+                  Vehicle No.
+                </Text>
+              </Th>
+              <Th w={"xs"}>
+                <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
+                  Vendor
                 </Text>
               </Th>
               <Th></Th>
@@ -61,22 +83,25 @@ const CustomerTable = (props) => {
             </Tr>
           </Thead>
           <Tbody justifyContent={"center"}>
-            {customerList?.customers?.map((customer, index) => (
-              <Tr key={customer._id}>
+            {rowMaterialList?.row_materials?.map((row, index) => (
+              <Tr key={row._id}>
                 <Td>{index + 1}</Td>
-                <Td>
-                  {customer.first_name} {customer.last_name}
-                </Td>
-                <Td>{customer.address}</Td>
-                <Td>{customer.phone_number}</Td>
-                <Td>{capitalizedString(customer.gov_or_cust)}</Td>
+                <Td>{capitalizedString(row?.type_of_material)}</Td>
+                <Td>₹ {row?.buying_price}</Td>
+                <Td>{row?.quantity}</Td>
+                <Td>{getFormattedDateforUI(row?.date)}</Td>
+                <Td>₹ {row?.mrm_paid_price}</Td>
+                <Td>₹ {row?.remaining_price}</Td>
+                <Td>{getFormattedDateforUI(row?.remaining_price_paid_on)}</Td>
+                <Td>{row?.vehicle_details?.vehicle_number || row?.vehicle_number }</Td>
+                <Td>{row?.vendor_details?.first_name} {row?.vendor_details?.last_name} - {capitalizedString(row?.vendor_details?.gov_or_vendor)}</Td>
                 <Td>
                   <CustomButton
                     size="sm"
                     bg="transparent"
                     color="#609966"
                     _hover={{ bg: "#4a875d", color: "#EDF1D6" }}
-                    onClick={() => handleUpdateClick({ id: customer._id, isUpdate, setIsUpdate, formik })}
+                    onClick={() => handleUpdateClick({ id: row._id, isUpdate, setIsUpdate, formik })}
                   >
                     {<EditIcon w={5} h={5} />}
                   </CustomButton>
@@ -87,7 +112,7 @@ const CustomerTable = (props) => {
                     bg="transparent"
                     color={"#D57E7E"}
                     _hover={{ bg: "#D25959", color: "#EDF1D6" }}
-                    onClick={() => handleDelete(customer._id)}
+                    onClick={() => handleDelete(row._id)}
                   >
                     {<DeleteIcon w={5} h={5} />}
                   </CustomButton>
@@ -101,4 +126,4 @@ const CustomerTable = (props) => {
   );
 };
 
-export default withHOC(CustomerPageProvider, CustomerTable);
+export default withHOC(RowMaterialPageProvider, RowTable);

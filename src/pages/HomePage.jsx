@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { GlobalState } from "../context/global-context";
-import Const from "../constants";
+import { Const } from "../constants";
 const Employee = React.lazy(() => import("./employee-page/index.jsx"));
 
 const HomePage = () => {

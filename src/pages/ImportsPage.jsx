@@ -1,7 +1,8 @@
 import React from "react";
 import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { GlobalState } from "../context/global-context";
-import Const from "../constants";
+import { Const } from "../constants";
+import RowMaterialPage from "./row-material-page";
 const Vendor = React.lazy(() => import("./vendor-page"));
 const Vehicle = React.lazy(() => import("./vehicle-page"));
 const Product = React.lazy(() => import("./product-page"));
@@ -44,6 +45,9 @@ const ImportsPage = () => {
         </TabPanel>
         <TabPanel>
           <Vehicle />
+        </TabPanel>
+        <TabPanel>
+          <RowMaterialPage />
         </TabPanel>
       </TabPanels>
     </Tabs>

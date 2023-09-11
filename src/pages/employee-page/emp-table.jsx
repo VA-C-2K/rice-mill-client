@@ -1,5 +1,6 @@
+/* eslint-disable react-refresh/only-export-components */
+/* eslint-disable react/prop-types */
 import { Box, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
-import React from "react";
 import CustomButton from "../../components/CustomButton";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { EmployeePageProvider, useEmployeePageContext } from "./provider";
