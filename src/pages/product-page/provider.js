@@ -55,7 +55,7 @@ function useProductPage() {
           }
         );
         toast({
-          title: "Vendor Created Successfully!",
+          title: "Product Created Successfully!",
           status: "success",
           duration: 5000,
           isClosable: true,
