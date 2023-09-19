@@ -1,5 +1,5 @@
 export const Const = {
-  HOME_PAGES: ["Employee", "Daily Expenses", "Attendance"],
+  HOME_PAGES: ["Employee", "Daily_Expenses", "Attendance"],
   IMPORT_PAGES: ["Vendor", "Products", "Vehicle","Row_Material_Entry"],
   EXPORT_PAGES: ["Customer", "Sales"],
   DATE_TIME_FORMATS: {

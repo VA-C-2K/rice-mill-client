@@ -122,6 +122,7 @@ const FormContainer = (props) => {
                       <FormikInput
                         name={`${FIELD_NAMES.BUYING_PRICE}`}
                         label={"Buying Price"}
+                        type="number"
                         placeholder="Enter Buying Price"
                         variant="outline"
                         focusBorderColor="#609966"
@@ -137,6 +138,7 @@ const FormContainer = (props) => {
                       label={"MRM Paid Amount"}
                       placeholder="Enter MRM Paid Amount"
                       variant="outline"
+                      type="number"
                       focusBorderColor="#609966"
                       _placeholder={{ opacity: 0.5, color: "#40513B" }}
                       color="#609966"
@@ -146,6 +148,7 @@ const FormContainer = (props) => {
                       <FormikInput
                         name={`${FIELD_NAMES.REMAINING_PRICE}`}
                         label={"Remaining Amount"}
+                        type="number"
                         placeholder="Enter Remaining Amount"
                         variant="outline"
                         focusBorderColor="#609966"
