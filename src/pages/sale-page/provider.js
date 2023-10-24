@@ -106,13 +106,13 @@ function useSalePage() {
 
   const handleCreate = useCallback(
     async (values, actions, onClose) => {
-      const { date, type_of_material, quantity, buying_price, mrm_paid_price, remaining_price, remaining_price_paid_on, vehicle_details, vehicle_number, vendor_details } = values;
+      const { customer_details, date, discount, final_amount_paid, next_due_on, product_details, quantity, remainig_amount, total_amount, vehicle_details,vehicle_number } = values;
       setLoading(true);
       try {
         await axios.post(
           `${baseURL}/sales/create`,
           {
-            date, type_of_material, quantity, buying_price, mrm_paid_price, remaining_price, remaining_price_paid_on, vehicle_details, vehicle_number, vendor_details
+            customer_details, date, discount, final_amount_paid, next_due_on, product_details, quantity, remainig_amount, total_amount, vehicle_details, vehicle_number
           },
           {
             headers: config.headers,
@@ -164,13 +164,13 @@ function useSalePage() {
 
   const handleUpdate = useCallback(
     async (values, actions, setIsUpdate) => {
-      const { row_id, date, type_of_material, quantity, buying_price, mrm_paid_price, remaining_price, remaining_price_paid_on, vehicle_details, vehicle_number, vendor_details } = values;
+      const { sale_id, customer_details, date, discount, final_amount_paid, next_due_on, product_details, quantity, remainig_amount, total_amount, vehicle_details,vehicle_number } = values;
       setLoading(true);
       try {
         await axios.put(
           `${baseURL}/sales/update`,
           {
-            row_id, date, type_of_material, quantity, buying_price, mrm_paid_price, remaining_price, remaining_price_paid_on, vehicle_details, vehicle_number, vendor_details
+            sale_id, customer_details, date, discount, final_amount_paid, next_due_on, product_details, quantity, remainig_amount, total_amount, vehicle_details,vehicle_number
           },
           {
             headers: config.headers,

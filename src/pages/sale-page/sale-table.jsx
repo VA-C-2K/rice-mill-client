@@ -18,7 +18,6 @@ const SaleTable = (props) => {
   if (salesList?.sales?.length === 0) {
     return <TableSkeleton NoRecordFound={true} />;
   }
-  console.log('salesList?.sales: ', salesList?.sales);
   return (
     <Box bg="#EDF1D6" w="100%" h="100%" p={3} borderWidth={"1px"} borderRadius={"lg"}>
       <TableContainer>
@@ -31,42 +30,37 @@ const SaleTable = (props) => {
                 </Text>
               </Th>
               <Th w={"xs"}>
-                {" "}
-                <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
-                  {" "}
-                  Type of Material
-                </Text>
-              </Th>
-              <Th w={"xs"}>
-                {" "}
-                <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
-                  {" "}
-                  Buying Price{" "}
-                </Text>
-              </Th>
-              <Th w={"xs"}>
-                <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
-                  Quantity
-                </Text>
-              </Th>
-              <Th w={"xs"}>
                 <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
                   Date
                 </Text>
               </Th>
               <Th w={"xs"}>
+                {" "}
                 <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
-                  MRM Paid Amount
+                  {" "}
+                  Product
+                </Text>
+              </Th>
+              <Th w={"12"}>
+                {" "}
+                <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
+                  {" "}
+                  Quantity{" "}
+                </Text>
+              </Th>
+              <Th w={"12"}>
+                <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
+                Total Amount
+                </Text>
+              </Th>
+              <Th w={"12"}>
+                <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
+                  Final Amount Paid
                 </Text>
               </Th>
               <Th w={"xs"}>
                 <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
-                  Remaining Amount
-                </Text>
-              </Th>
-              <Th w={"xs"}>
-                <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
-                  Next Due on
+                  Customer Name
                 </Text>
               </Th>
               <Th w={"xs"}>
@@ -76,7 +70,17 @@ const SaleTable = (props) => {
               </Th>
               <Th w={"xs"}>
                 <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
-                  Vendor
+                  Discount
+                </Text>
+              </Th>
+                <Th w={"12"}>
+                <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
+                Remaining Amount
+                </Text>
+              </Th>
+              <Th w={"xs"}>
+                <Text as="b" fontSize="sm" fontFamily="Work sans" color="#40513B">
+                Next Due On
                 </Text>
               </Th>
               <Th></Th>
@@ -88,22 +92,23 @@ const SaleTable = (props) => {
             {salesList?.sales?.map((sale, index) => (
               <Tr key={sale._id}>
                 <Td>{index + 1}</Td>
-                <Td>{capitalizedString(sale?.type_of_material)}</Td>
-                <Td>₹ {sale?.buying_price}</Td>
-                <Td>{sale?.quantity}</Td>
                 <Td>{getFormattedDateforUI(sale?.date)}</Td>
-                <Td>₹ {sale?.mrm_paid_price}</Td>
-                <Td>₹ {sale?.remaining_price}</Td>
-                <Td>{getFormattedDateforUI(sale?.remaining_price_paid_on)}</Td>
+                <Td>{capitalizedString(sale?.product_details?.name)} ({sale?.product_details?.current_rate})</Td>
+                <Td>{sale?.quantity} kg</Td>
+                <Td>₹ {sale?.total_amount}</Td>
+                <Td>₹ {sale?.final_amount_paid}</Td>
+                <Td>{sale?.customer_details?.first_name || "-"} {sale?.customer_details?.last_name || "-"}</Td>
                 <Td>{sale?.vehicle_details?.vehicle_number || sale?.vehicle_number }</Td>
-                <Td>{sale?.vendor_details?.first_name} {sale?.vendor_details?.last_name} - {capitalizedString(sale?.vendor_details?.gov_or_vendor)}</Td>
+                <Td>{sale?.discount || 0} %</Td>
+                <Td>₹ {sale?.remainig_amount || "-"}</Td>
+                <Td>{getFormattedDateforUI(sale?.next_due_on) || "-"}</Td>
                 <Td>
                   <CustomButton
                     size="sm"
                     bg="transparent"
                     color="#609966"
                     _hover={{ bg: "#4a875d", color: "#EDF1D6" }}
-                    onClick={() => handleUpdateClick({ id: sale._id, isUpdate, setIsUpdate, formik })}
+                    onClick={() => {}}
                   >
                     {<ExternalLinkIcon w={5} h={5} />}
                   </CustomButton>
