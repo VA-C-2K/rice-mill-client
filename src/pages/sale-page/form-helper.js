@@ -8,7 +8,6 @@ export const FIELD_NAMES = {
   QUANTITY: "quantity",
   DISCOUNT: "discount",
   FINAL_AMT_PAID: "final_amount_paid",
-  REMAINING_AMT: "remainig_amount",
   NEXT_DUE_ON: "next_due_on",
   VEHICLE_NO: "vehicle_number",
   PROD_DETAILS: "product_details",
@@ -19,12 +18,11 @@ export const FIELD_NAMES = {
 export const getInitialValues = (data = {}) => {
   return {
     [FIELD_NAMES.DATE]: getFormattedDateforAPI(data[FIELD_NAMES.DATE]) || new Date().toISOString().slice(0, 10),
-    [FIELD_NAMES.TOTAL_AMT]: data[FIELD_NAMES.TOTAL_AMT] || "",
+    [FIELD_NAMES.TOTAL_AMT]: data[FIELD_NAMES.TOTAL_AMT] || 0,
     [FIELD_NAMES.QUANTITY]: data[FIELD_NAMES.QUANTITY] || "",
-    [FIELD_NAMES.DISCOUNT]: data[FIELD_NAMES.DISCOUNT] || "",
+    [FIELD_NAMES.DISCOUNT]: data[FIELD_NAMES.DISCOUNT] || 0,
     [FIELD_NAMES.FINAL_AMT_PAID]: data[FIELD_NAMES.FINAL_AMT_PAID] || "",
-    [FIELD_NAMES.REMAINING_AMT]: data[FIELD_NAMES.REMAINING_AMT] || "",
-    [FIELD_NAMES.NEXT_DUE_ON]: data[FIELD_NAMES.NEXT_DUE_ON] || "",
+    [FIELD_NAMES.NEXT_DUE_ON]: getFormattedDateforAPI(data[FIELD_NAMES.NEXT_DUE_ON]) || "",
     [FIELD_NAMES.VEHICLE_NO]: data[FIELD_NAMES.VEHICLE_NO] || "",
     [FIELD_NAMES.PROD_DETAILS]: data[FIELD_NAMES.PROD_DETAILS] || "",
     [FIELD_NAMES.CUST_DETAILS]: data[FIELD_NAMES.CUST_DETAILS] || "",
@@ -35,7 +33,6 @@ export const getInitialValues = (data = {}) => {
 export const getValidation = () => {
   return Yup.object().shape({
     [FIELD_NAMES.DATE]: Yup.string().required("Date is required"),
-    [FIELD_NAMES.TOTAL_AMT]: Yup.string().required("Total Amount is required"),
     [FIELD_NAMES.QUANTITY]: Yup.string().required("Quantity is required"),
     [FIELD_NAMES.DISCOUNT]: Yup.string().required("Discount is required"),
     [FIELD_NAMES.FINAL_AMT_PAID]: Yup.string().required("Final Amount is required"),
@@ -50,7 +47,7 @@ export const getValidation = () => {
     if (!vehicleDetails && !vehicleNo) {
       return this.createError({
         path: [FIELD_NAMES.VEHICLE_DETAILS],
-        message: 'At least one field must be filled',
+        message: 'Either Vehicle No or Vehicle Details is required',
       });
     }
 

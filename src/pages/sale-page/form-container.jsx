@@ -23,12 +23,32 @@ import FormikInput from "../../components/FormikInput";
 import Pagination from "../../components/Pagination";
 import { GlobalState } from "../../context/global-context";
 import { capitalizedString } from "../../utils/string-helper";
+import { useToast } from "@chakra-ui/react";
 
 const FormContainer = (props) => {
   const { setPage } = GlobalState();
+  const toast = useToast();
   const { loading, prodList, custList, vehicleList, salesList } =
     useSalePageContext();
   const { isUpdate, setIsUpdate, formik, isOpen, onOpen, onClose } = props;
+  const handleQuantityChanges = () => {
+    const productDetails = prodList?.products?.find((product) => product._id === formik.values[FIELD_NAMES.PROD_DETAILS]);
+    if (productDetails?.quantity < Number(formik.values[FIELD_NAMES.QUANTITY])) {
+      formik.setFieldError(FIELD_NAMES.QUANTITY, "Invalid Quantity");
+      toast({
+        title: "Invalid Quantity!",
+        description: `Please enter a valid quantity, available quantity is ${productDetails?.quantity}`,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    } else {
+      formik.setFieldError(FIELD_NAMES.QUANTITY, ''); // Clear the error message
+    }
+    const totalAmt = productDetails?.current_rate * formik.values[FIELD_NAMES.QUANTITY];
+    formik.setFieldValue(FIELD_NAMES.TOTAL_AMT, totalAmt || 0);
+  };
 
   return (
     <>
@@ -53,7 +73,7 @@ const FormContainer = (props) => {
             onClose={onClose}
           >
             <ModalOverlay />
-            <ModalContent bg="#EDF1D6" p={2} width={"full"} maxW="600px">
+            <ModalContent bg="#EDF1D6" p={2} width={"full"} maxW="500px">
               <ModalHeader>
                 <Text
                   as="b"
@@ -61,9 +81,7 @@ const FormContainer = (props) => {
                   fontFamily="Work sans"
                   color="#40513B"
                 >
-                  {isUpdate
-                    ? "Update Sale Details"
-                    : "Add Sale Details"}
+                  {isUpdate ? "Update Sale Details" : "Add Sale Details"}
                 </Text>
               </ModalHeader>
               {!isUpdate && <ModalCloseButton />}
@@ -74,20 +92,26 @@ const FormContainer = (props) => {
                     spacing={"10px"}
                     onSubmit={formik.handleSubmit}
                   >
-                      
                     <HStack>
                       <FormikInput
-                        name={`${FIELD_NAMES.TOTAL_AMT}`}
-                        label={"Total Amount"}
-                        placeholder="Enter Total Amount"
-                        type="number"
+                        name={`${FIELD_NAMES.PROD_DETAILS}`}
+                        label={"Product Details"}
                         variant="outline"
+                        type="select"
+                        placeholder="Select Product Details"
                         focusBorderColor="#609966"
                         _placeholder={{ opacity: 0.5, color: "#40513B" }}
                         color="#609966"
                         fontWeight={500}
                         border="1px"
-                      />
+                      >
+                        {prodList?.products?.map((prod) => (
+                          <option key={prod?._id} value={prod?._id}>
+                            {prod?.name} - ₹ {prod?.current_rate}(
+                            {prod?.quantity})
+                          </option>
+                        ))}
+                      </FormikInput>
                       <FormikInput
                         name={`${FIELD_NAMES.QUANTITY}`}
                         label={"Quantity"}
@@ -99,22 +123,57 @@ const FormContainer = (props) => {
                         color="#609966"
                         fontWeight={500}
                         border="1px"
+                        onBlur={handleQuantityChanges}
                       />
+                    </HStack>
+                    <HStack>
                       <FormikInput
-                        name={`${FIELD_NAMES.DISCOUNT}`}
-                        label={"Discount"}
+                        name={`${FIELD_NAMES.TOTAL_AMT}`}
+                        label={"Total Amount"}
                         type="number"
-                        placeholder="Enter Discount"
                         variant="outline"
                         focusBorderColor="#609966"
                         _placeholder={{ opacity: 0.5, color: "#40513B" }}
                         color="#609966"
                         fontWeight={500}
                         border="1px"
+                        readOnly
                       />
+                      <FormikInput
+                        name={`${FIELD_NAMES.FINAL_AMT_PAID}`}
+                        label={"Final Amount Paid"}
+                        type="number"
+                        placeholder="Enter Final Amount Paid"
+                        variant="outline"
+                        focusBorderColor="#609966"
+                        _placeholder={{ opacity: 0.5, color: "#40513B" }}
+                        color="#609966"
+                        fontWeight={500}
+                        border="1px"
+                      />                     
                     </HStack>
-                    <HStack>
                     <FormikInput
+                      name={`${FIELD_NAMES.CUST_DETAILS}`}
+                      label={"Customer Details"}
+                      placeholder="Select Customer"
+                      variant="outline"
+                      type="select"
+                      focusBorderColor="#609966"
+                      _placeholder={{ opacity: 0.5, color: "#40513B" }}
+                      color="#609966"
+                      fontWeight={500}
+                      border="1px"
+                    >
+                      {custList?.customers?.map((cust) => (
+                        <option key={cust?._id} value={cust?._id}>
+                          {cust?.first_name} {cust?.last_name}{" "}
+                          {cust?.phone_number} (
+                          {capitalizedString(cust?.gov_or_cust)})
+                        </option>
+                      ))}
+                    </FormikInput>
+                    <HStack>
+                      <FormikInput
                         name={`${FIELD_NAMES.DATE}`}
                         label={"Date"}
                         type="date"
@@ -126,6 +185,20 @@ const FormContainer = (props) => {
                         fontWeight={500}
                         border="1px"
                       />
+                       <FormikInput
+                        name={`${FIELD_NAMES.DISCOUNT}`}
+                        label={"Discount"}
+                        type="number"
+                        placeholder="Enter Discount Amount"
+                        variant="outline"
+                        focusBorderColor="#609966"
+                        _placeholder={{ opacity: 0.5, color: "#40513B" }}
+                        color="#609966"
+                        fontWeight={500}
+                        border="1px"
+                      />
+                    </HStack>
+                    <HStack>
                       <FormikInput
                         name={`${FIELD_NAMES.NEXT_DUE_ON}`}
                         label={"Next Due On"}
@@ -138,33 +211,7 @@ const FormContainer = (props) => {
                         fontWeight={500}
                         border="1px"
                       />
-                    </HStack>
-                    <HStack>
                       <FormikInput
-                        name={`${FIELD_NAMES.FINAL_AMT_PAID}`}
-                        label={"Final Amount Paid"}
-                        type="number"
-                        placeholder="Enter Final Amount Paid"
-                        variant="outline"
-                        focusBorderColor="#609966"
-                        _placeholder={{ opacity: 0.5, color: "#40513B" }}
-                        color="#609966"
-                        fontWeight={500}
-                        border="1px"
-                      />
-                      <FormikInput
-                        name={`${FIELD_NAMES.REMAINING_AMT}`}
-                        label={"Remaining Amount"}
-                        placeholder="Enter Remaining Amount"
-                        variant="outline"
-                        type="number"
-                        focusBorderColor="#609966"
-                        _placeholder={{ opacity: 0.5, color: "#40513B" }}
-                        color="#609966"
-                        fontWeight={500}
-                        border="1px"
-                      />
-                       <FormikInput
                         name={`${FIELD_NAMES.VEHICLE_NO}`}
                         label={"Vehicle Number"}
                         placeholder="Enter Vehicle Number"
@@ -196,44 +243,7 @@ const FormContainer = (props) => {
                         </option>
                       ))}
                     </FormikInput>
-                    <FormikInput
-                      name={`${FIELD_NAMES.CUST_DETAILS}`}
-                      label={"Customer Details"}
-                      placeholder="Select Customer"
-                      variant="outline"
-                      type="select"
-                      focusBorderColor="#609966"
-                      _placeholder={{ opacity: 0.5, color: "#40513B" }}
-                      color="#609966"
-                      fontWeight={500}
-                      border="1px"
-                    >
-                      {custList?.customers?.map((cust) => (
-                        <option key={cust?._id} value={cust?._id}>
-                          {cust?.first_name} {cust?.last_name}{" "} 
-                          {cust?.phone_number} ({capitalizedString(cust?.gov_or_cust)})
-                        </option>
-                      ))}
-                    </FormikInput>
-                    <FormikInput
-                      name={`${FIELD_NAMES.PROD_DETAILS}`}
-                      label={"Product Details"}
-                      variant="outline"
-                      type="select"
-                      placeholder="Select Product Details"
-                      focusBorderColor="#609966"
-                      _placeholder={{ opacity: 0.5, color: "#40513B" }}
-                      color="#609966"
-                      fontWeight={500}
-                      border="1px"
-                    >
-                      {prodList?.products?.map((prod) => (
-                        <option key={prod?._id} value={prod?._id}>
-                          {prod?.name} - ₹ {prod?.current_rate}({prod?.quantity}
-                          )
-                        </option>
-                      ))}
-                    </FormikInput>
+
                     {!isUpdate && (
                       <CustomButton
                         type="submit"

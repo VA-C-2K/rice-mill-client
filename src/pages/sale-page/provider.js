@@ -20,7 +20,7 @@ function useSalePage() {
   const [vehicleList, setVehicleList] = useState([]);
   const [salesList, setSalesList] = useState([]);
 
-  const getProducts = useCallback(async() => {
+  const getProducts = useCallback(async () => {
     setLoading(true);
     try {
       const data = await axios.get(`${baseURL}/product`, {
@@ -41,7 +41,7 @@ function useSalePage() {
     }
   }, [config.headers, toast]);
 
-  const getVehicles = useCallback(async() => {
+  const getVehicles = useCallback(async () => {
     setLoading(true);
     try {
       const data = await axios.get(`${baseURL}/vehicle?list=true`, {
@@ -106,13 +106,38 @@ function useSalePage() {
 
   const handleCreate = useCallback(
     async (values, actions, onClose) => {
-      const { customer_details, date, discount, final_amount_paid, next_due_on, product_details, quantity, remainig_amount, total_amount, vehicle_details,vehicle_number } = values;
+      const { customer_details, date, discount, final_amount_paid, next_due_on, product_details, quantity, total_amount, vehicle_details, vehicle_number } = values;
+      if (total_amount > final_amount_paid) {
+        const calculatedDiscount = total_amount - final_amount_paid;
+        if (discount !== calculatedDiscount) {
+          toast({
+            title: "Invalid Discount!",
+            description: "Discount should be equal to the difference between total amount and final amount paid.",
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+            position: "bottom",
+          });
+          return;
+        } else if (!next_due_on) {
+          toast({
+            title: "Invalid Amount!",
+            description: "Please enter a valid Next Due Date.",
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+            position: "bottom",
+          });
+          return;
+        }
+      }
+      
       setLoading(true);
       try {
         await axios.post(
           `${baseURL}/sales/create`,
           {
-            customer_details, date, discount, final_amount_paid, next_due_on, product_details, quantity, remainig_amount, total_amount, vehicle_details, vehicle_number
+            customer_details, date, discount, final_amount_paid, next_due_on, product_details, quantity, total_amount, vehicle_details, vehicle_number
           },
           {
             headers: config.headers,
@@ -164,13 +189,37 @@ function useSalePage() {
 
   const handleUpdate = useCallback(
     async (values, actions, setIsUpdate) => {
-      const { sale_id, customer_details, date, discount, final_amount_paid, next_due_on, product_details, quantity, remainig_amount, total_amount, vehicle_details,vehicle_number } = values;
+      const { sale_id, customer_details, date, discount, final_amount_paid, next_due_on, product_details, quantity, total_amount, vehicle_details, vehicle_number } = values;
+      if (total_amount > final_amount_paid) {
+        const calculatedDiscount = total_amount - final_amount_paid;
+        if (!next_due_on && (discount !== calculatedDiscount)) {
+          toast({
+            title: "Invalid Discount!",
+            description: "Discount should be equal to the difference between total amount and final amount paid.",
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+            position: "bottom",
+          });
+          return;
+        } else if (!discount && !next_due_on) {
+          toast({
+            title: "Invalid Amount!",
+            description: "Please enter a valid Next Due Date.",
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+            position: "bottom",
+          });
+          return;
+        }
+      }
       setLoading(true);
       try {
         await axios.put(
           `${baseURL}/sales/update`,
           {
-            sale_id, customer_details, date, discount, final_amount_paid, next_due_on, product_details, quantity, remainig_amount, total_amount, vehicle_details,vehicle_number
+            sale_id, customer_details, date, discount, final_amount_paid, next_due_on, product_details, quantity, total_amount, vehicle_details, vehicle_number
           },
           {
             headers: config.headers,

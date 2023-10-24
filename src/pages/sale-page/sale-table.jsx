@@ -93,14 +93,14 @@ const SaleTable = (props) => {
               <Tr key={sale._id}>
                 <Td>{index + 1}</Td>
                 <Td>{getFormattedDateforUI(sale?.date)}</Td>
-                <Td>{capitalizedString(sale?.product_details?.name)} ({sale?.product_details?.current_rate})</Td>
+                <Td>{capitalizedString(sale?.product_details?.name)}</Td>
                 <Td>{sale?.quantity} kg</Td>
                 <Td>₹ {sale?.total_amount}</Td>
                 <Td>₹ {sale?.final_amount_paid}</Td>
                 <Td>{sale?.customer_details?.first_name || "-"} {sale?.customer_details?.last_name || "-"}</Td>
                 <Td>{sale?.vehicle_details?.vehicle_number || sale?.vehicle_number }</Td>
-                <Td>{sale?.discount || 0} %</Td>
-                <Td>₹ {sale?.remainig_amount || "-"}</Td>
+                <Td>₹ {sale?.discount || 0}</Td>
+                <Td>₹ {sale?.remainig_amount || 0}</Td>
                 <Td>{getFormattedDateforUI(sale?.next_due_on) || "-"}</Td>
                 <Td>
                   <CustomButton
