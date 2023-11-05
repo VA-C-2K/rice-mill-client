@@ -40,6 +40,13 @@ function useVendorPage() {
 
   const handleCreate = useCallback(
     async (values, actions, onClose) => {
+      toast({
+        title:"Creating...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       const { address, first_name, gov_or_vendor, last_name, phone_number } = values;
       setLoading(true);
       try {
@@ -56,6 +63,7 @@ function useVendorPage() {
             headers: config.headers,
           }
         );
+        toast.close();
         toast({
           title: "Vendor Created Successfully!",
           status: "success",
@@ -68,6 +76,7 @@ function useVendorPage() {
         onClose(false);
         setFetchList((prev) => prev + 1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,
@@ -102,6 +111,13 @@ function useVendorPage() {
 
   const handleUpdate = useCallback(
     async (values, actions, setIsUpdate) => {
+      toast({
+        title:"Updating...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       const { vendor_id, address, first_name, gov_or_vendor, last_name, phone_number } = values;
       setLoading(true);
       try {
@@ -119,6 +135,7 @@ function useVendorPage() {
             headers: config.headers,
           }
         );
+        toast.close();
         toast({
           title: "Vendor Updated Successfully!",
           status: "success",
@@ -131,6 +148,7 @@ function useVendorPage() {
         setIsUpdate(false);
         setFetchList((prev) => prev + 1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,
@@ -147,11 +165,19 @@ function useVendorPage() {
 
   const handleDelete = useCallback(
     async (id) => {
+      toast({
+        title:"Deleting...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       setLoading(true);
       try {
         await axios.delete(`${baseURL}/vendor/delete?vendor_id=${id}`, {
           headers: config.headers,
         });
+        toast.close();
         toast({
           title: "Vendor Deleted Successfully!",
           status: "success",
@@ -163,6 +189,7 @@ function useVendorPage() {
         setFetchList((prev) => prev + 1);
         setPage(1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,

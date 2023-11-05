@@ -40,6 +40,13 @@ function useCustomerPage() {
 
   const handleCreate = useCallback(
     async (values, actions, onClose) => {
+      toast({
+        title:"Saving...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       const { address, first_name, gov_or_cust, last_name, phone_number } = values;
       setLoading(true);
       try {
@@ -56,6 +63,7 @@ function useCustomerPage() {
             headers: config.headers,
           }
         );
+        toast.close();
         toast({
           title: "Customer Created Successfully!",
           status: "success",
@@ -68,6 +76,7 @@ function useCustomerPage() {
         onClose(false);
         setFetchList((prev) => prev + 1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,
@@ -102,6 +111,13 @@ function useCustomerPage() {
 
   const handleUpdate = useCallback(
     async (values, actions, setIsUpdate) => {
+      toast({
+        title:"Updating...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       const { cust_id, address, first_name, gov_or_cust, last_name, phone_number } = values;
       setLoading(true);
       try {
@@ -119,6 +135,7 @@ function useCustomerPage() {
             headers: config.headers,
           }
         );
+        toast.close();
         toast({
           title: "Customer Updated Successfully!",
           status: "success",
@@ -131,6 +148,7 @@ function useCustomerPage() {
         setIsUpdate(false);
         setFetchList((prev) => prev + 1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,
@@ -147,11 +165,19 @@ function useCustomerPage() {
 
   const handleDelete = useCallback(
     async (id) => {
+      toast({
+        title:"Deleting...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       setLoading(true);
       try {
         await axios.delete(`${baseURL}/customer/delete?cust_id=${id}`, {
           headers: config.headers,
         });
+        toast.close();
         toast({
           title: "Customer Deleted Successfully!",
           status: "success",
@@ -163,6 +189,7 @@ function useCustomerPage() {
         setPage(1);
         setFetchList((prev) => prev + 1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,

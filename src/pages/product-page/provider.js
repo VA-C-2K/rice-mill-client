@@ -41,6 +41,13 @@ function useProductPage() {
   const handleCreate = useCallback(
     async (values, actions, onClose) => {
       const { name, quantity, current_rate } = values;
+      toast({
+        title:"Creating...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       setLoading(true);
       try {
         await axios.post(
@@ -54,6 +61,7 @@ function useProductPage() {
             headers: config.headers,
           }
         );
+        toast.close();
         toast({
           title: "Product Created Successfully!",
           status: "success",
@@ -66,6 +74,7 @@ function useProductPage() {
         onClose(false);
         setFetchList((prev) => prev + 1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,
@@ -100,6 +109,13 @@ function useProductPage() {
 
   const handleUpdate = useCallback(
     async (values, actions, setIsUpdate) => {
+      toast({
+        title:"Updating...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       const { prod_id, name, quantity, current_rate } = values;
       setLoading(true);
       try {
@@ -115,6 +131,7 @@ function useProductPage() {
             headers: config.headers,
           }
         );
+        toast.close();
         toast({
           title: "Product Updated Successfully!",
           status: "success",
@@ -127,6 +144,7 @@ function useProductPage() {
         setIsUpdate(false);
         setFetchList((prev) => prev + 1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,
@@ -143,11 +161,19 @@ function useProductPage() {
 
   const handleDelete = useCallback(
     async (id) => {
+      toast({
+        title:"Deleting...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       setLoading(true);
       try {
         await axios.delete(`${baseURL}/product/delete?prod_id=${id}`, {
           headers: config.headers,
         });
+        toast.close();
         toast({
           title: "Product Deleted Successfully!",
           status: "success",
@@ -158,6 +184,7 @@ function useProductPage() {
         setLoading(false);
         setFetchList((prev) => prev + 1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,

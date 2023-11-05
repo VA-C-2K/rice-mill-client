@@ -14,10 +14,18 @@ function useAuthPage() {
 
   const handleLogin = useCallback(
     async (values, actions) => {
+      toast({
+        title:"Logging in...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       const { phonenumber, password } = values;
       setLoading(true);
       try {
         const { data } = await axios.post(login(), { password, phonenumber }, config());
+        toast.close();
         toast({
           title: "Login Successful",
           status: "success",
@@ -35,6 +43,7 @@ function useAuthPage() {
         actions.resetForm();
         navigate("/home");
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,
@@ -51,6 +60,13 @@ function useAuthPage() {
 
   const handleSignUp = useCallback(
     async (values, actions) => {
+      toast({
+        title:"Signing Up...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       const { username, phonenumber, password } = values;
       setLoading(true);
       try {
@@ -63,6 +79,7 @@ function useAuthPage() {
           },
           config()
         );
+        toast.close();
         toast({
           title: "Registration Successful",
           status: "success",
@@ -79,7 +96,7 @@ function useAuthPage() {
         actions.resetForm();
         navigate("/home");
       } catch (error) {
-        console.log('error: ', error);
+        toast.close();
         toast({
           title: "Error Occured!",
           status: "error",

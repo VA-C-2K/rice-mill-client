@@ -63,6 +63,13 @@ function useVehiclePage() {
 
   const handleCreate = useCallback(
     async (values, actions, onClose) => {
+      toast({
+        title:"Saving...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       const { vehicle_number, employee_id } = values;
       setLoading(true);
       try {
@@ -75,6 +82,7 @@ function useVehiclePage() {
             headers: config.headers,
           }
         );
+        toast.close();
         toast({
           title: "Vehicle Record Created Successfully!",
           status: "success",
@@ -87,6 +95,7 @@ function useVehiclePage() {
         onClose(false);
         setFetchList((prev) => prev + 1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,
@@ -121,6 +130,13 @@ function useVehiclePage() {
 
   const handleUpdate = useCallback(
     async (values, actions, setIsUpdate) => {
+      toast({
+        title:"Updating...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       const { vehicle_id, vehicle_number, employee_id } = values;
       setLoading(true);
       try {
@@ -133,6 +149,7 @@ function useVehiclePage() {
             headers: config.headers,
           }
         );
+        toast.close();
         toast({
           title: "Vehicle Recors is Updated Successfully!",
           status: "success",
@@ -145,6 +162,7 @@ function useVehiclePage() {
         setIsUpdate(false);
         setFetchList((prev) => prev + 1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,
@@ -161,11 +179,19 @@ function useVehiclePage() {
 
   const handleDelete = useCallback(
     async (id) => {
+      toast({
+        title:"Deleting...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       setLoading(true);
       try {
         await axios.delete(`${baseURL}/vehicle/delete?vehicle_id=${id}`, {
           headers: config.headers,
         });
+        toast.close();
         toast({
           title: "Vehicle Record is Deleted Successfully!",
           status: "success",
@@ -177,6 +203,7 @@ function useVehiclePage() {
         setFetchList((prev) => prev + 1);
         setPage(1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,

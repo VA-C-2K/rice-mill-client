@@ -85,6 +85,13 @@ function useRowMaterialPage() {
 
   const handleCreate = useCallback(
     async (values, actions, onClose) => {
+      toast({
+        title:"Saving...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       const { date, type_of_material, quantity, buying_price, mrm_paid_price, remaining_price, remaining_price_paid_on, vehicle_details, vehicle_number, vendor_details } = values;
       setLoading(true);
       try {
@@ -97,6 +104,7 @@ function useRowMaterialPage() {
             headers: config.headers,
           }
         );
+        toast.close();
         toast({
           title: "Row Material record Created Successfully!",
           status: "success",
@@ -109,6 +117,7 @@ function useRowMaterialPage() {
         onClose(false);
         setFetchList((prev) => prev + 1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,
@@ -143,6 +152,13 @@ function useRowMaterialPage() {
 
   const handleUpdate = useCallback(
     async (values, actions, setIsUpdate) => {
+      toast({
+        title:"Updating...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       const { row_id, date, type_of_material, quantity, buying_price, mrm_paid_price, remaining_price, remaining_price_paid_on, vehicle_details, vehicle_number, vendor_details } = values;
       setLoading(true);
       try {
@@ -155,6 +171,7 @@ function useRowMaterialPage() {
             headers: config.headers,
           }
         );
+        toast.close();
         toast({
           title: "Row Material record Updated Successfully!",
           status: "success",
@@ -167,6 +184,7 @@ function useRowMaterialPage() {
         setIsUpdate(false);
         setFetchList((prev) => prev + 1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,
@@ -183,11 +201,19 @@ function useRowMaterialPage() {
 
   const handleDelete = useCallback(
     async (id) => {
+      toast({
+        title:"Deleting...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       setLoading(true);
       try {
         await axios.delete(`${baseURL}/row-material/delete?row_id=${id}`, {
           headers: config.headers,
         });
+        toast.close();
         toast({
           title: "Row Material record Deleted Successfully!",
           status: "success",
@@ -199,6 +225,7 @@ function useRowMaterialPage() {
         setFetchList((prev) => prev + 1);
         setPage(1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,

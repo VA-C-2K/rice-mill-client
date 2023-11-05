@@ -106,10 +106,18 @@ function useSalePage() {
 
   const handleCreate = useCallback(
     async (values, actions, onClose) => {
+      toast({
+        title:"Saving...",
+        status:"loading",
+        duration: 100,
+        isClosable: true,
+        position: "bottom",
+      });
       const { customer_details, date, discount, final_amount_paid, next_due_on, product_details, quantity, total_amount, vehicle_details, vehicle_number } = values;
-      if (total_amount > final_amount_paid) {
-        const calculatedDiscount = total_amount - final_amount_paid;
-        if (discount !== calculatedDiscount) {
+      if (Number(total_amount) > Number(final_amount_paid)) {
+        const calculatedDiscount = total_amount - Number(final_amount_paid);
+        if (!next_due_on && (Number(discount) !== calculatedDiscount)) {
+          toast.close();
           toast({
             title: "Invalid Discount!",
             description: "Discount should be equal to the difference between total amount and final amount paid.",
@@ -119,7 +127,8 @@ function useSalePage() {
             position: "bottom",
           });
           return;
-        } else if (!next_due_on) {
+        } else if (!discount && !next_due_on) {
+          toast.close();
           toast({
             title: "Invalid Amount!",
             description: "Please enter a valid Next Due Date.",
@@ -143,6 +152,7 @@ function useSalePage() {
             headers: config.headers,
           }
         );
+        toast.close();
         toast({
           title: "Sales record Created Successfully!",
           status: "success",
@@ -155,6 +165,7 @@ function useSalePage() {
         onClose(false);
         setFetchList((prev) => prev + 1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,
@@ -189,10 +200,18 @@ function useSalePage() {
 
   const handleUpdate = useCallback(
     async (values, actions, setIsUpdate) => {
+      toast({
+        title:"Updating...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       const { sale_id, customer_details, date, discount, final_amount_paid, next_due_on, product_details, quantity, total_amount, vehicle_details, vehicle_number } = values;
-      if (total_amount > final_amount_paid) {
+      if (Number(total_amount) > Number(final_amount_paid)) {
         const calculatedDiscount = total_amount - final_amount_paid;
-        if (!next_due_on && (discount !== calculatedDiscount)) {
+        if (!next_due_on && (Number(discount) !== calculatedDiscount)) {
+          toast.close();
           toast({
             title: "Invalid Discount!",
             description: "Discount should be equal to the difference between total amount and final amount paid.",
@@ -203,6 +222,7 @@ function useSalePage() {
           });
           return;
         } else if (!discount && !next_due_on) {
+          toast.close();
           toast({
             title: "Invalid Amount!",
             description: "Please enter a valid Next Due Date.",
@@ -225,6 +245,7 @@ function useSalePage() {
             headers: config.headers,
           }
         );
+        toast.close();
         toast({
           title: "Sales record Updated Successfully!",
           status: "success",
@@ -237,6 +258,7 @@ function useSalePage() {
         setIsUpdate(false);
         setFetchList((prev) => prev + 1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,
@@ -253,11 +275,19 @@ function useSalePage() {
 
   const handleDelete = useCallback(
     async (id) => {
+      toast({
+        title:"Deleting...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       setLoading(true);
       try {
         await axios.delete(`${baseURL}/sales/delete?sale_id=${id}`, {
           headers: config.headers,
         });
+        toast.close();
         toast({
           title: "Sales record Deleted Successfully!",
           status: "success",
@@ -269,6 +299,7 @@ function useSalePage() {
         setFetchList((prev) => prev + 1);
         setPage(1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,

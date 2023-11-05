@@ -40,6 +40,13 @@ function useDailyExpensePage() {
 
   const handleCreate = useCallback(
     async (values, actions, onClose) => {
+      toast({
+        title:"Saving...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       const { date, description, amount, entity } = values;
       setLoading(true);
       try {
@@ -52,6 +59,7 @@ function useDailyExpensePage() {
             headers: config.headers,
           }
         );
+        toast.close();
         toast({
           title: "Daily Expense Created Successfully!",
           status: "success",
@@ -64,6 +72,7 @@ function useDailyExpensePage() {
         onClose(false);
         setFetchList((prev) => prev + 1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,
@@ -98,6 +107,13 @@ function useDailyExpensePage() {
 
   const handleUpdate = useCallback(
     async (values, actions, setIsUpdate) => {
+      toast({
+        title:"Updating...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       const { daily_expense_id, date, description, amount, entity } = values;
       setLoading(true);
       try {
@@ -110,6 +126,7 @@ function useDailyExpensePage() {
             headers: config.headers,
           }
         );
+        toast.close();
         toast({
           title: "Daily Expense Updated Successfully!",
           status: "success",
@@ -122,6 +139,7 @@ function useDailyExpensePage() {
         setIsUpdate(false);
         setFetchList((prev) => prev + 1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,
@@ -138,11 +156,19 @@ function useDailyExpensePage() {
 
   const handleDelete = useCallback(
     async (id) => {
+      toast({
+        title:"Deleting...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       setLoading(true);
       try {
         await axios.delete(`${baseURL}/daily-expenses/delete?daily_expense_id=${id}`, {
           headers: config.headers,
         });
+        toast.close();
         toast({
           title: "Daily Expense Deleted Successfully!",
           status: "success",
@@ -154,6 +180,7 @@ function useDailyExpensePage() {
         setPage(1);
         setFetchList((prev) => prev + 1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,

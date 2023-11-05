@@ -41,6 +41,13 @@ function useEmployeePage() {
   const handleCreate = useCallback(
     async (values, actions, onClose) => {
       const { address, first_name, last_name, phone_number, salary, aadhar_card_no, no_of_leaves, role, over_time_hrs } = values;
+      toast({
+        title:"Creating...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       setLoading(true);
       try {
         await axios.post(
@@ -60,6 +67,7 @@ function useEmployeePage() {
             headers: config.headers,
           }
         );
+        toast.close();
         toast({
           title: "Employee Created Successfully!",
           status: "success",
@@ -72,6 +80,7 @@ function useEmployeePage() {
         onClose(false);
         setFetchList((prev) => prev + 1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,
@@ -106,6 +115,13 @@ function useEmployeePage() {
 
   const handleUpdate = useCallback(
     async (values, actions, setIsUpdate) => {
+      toast({
+        title:"Updating...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       const { emp_id, address, first_name, last_name, phone_number, salary, aadhar_card_no, no_of_leaves, role, over_time_hrs } = values;
       setLoading(true);
       try {
@@ -127,6 +143,7 @@ function useEmployeePage() {
             headers: config.headers,
           }
         );
+        toast.close();
         toast({
           title: "Employee Updated Successfully!",
           status: "success",
@@ -139,6 +156,7 @@ function useEmployeePage() {
         setIsUpdate(false);
         setFetchList((prev) => prev + 1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,
@@ -156,10 +174,18 @@ function useEmployeePage() {
   const handleDelete = useCallback(
     async (id) => {
       setLoading(true);
+      toast({
+        title:"Deleting...",
+        status:"loading",
+        duration: 500,
+        isClosable: true,
+        position: "bottom",
+      });
       try {
         await axios.delete(`${baseURL}/employee/delete?emp_id=${id}`, {
           headers: config.headers,
         });
+        toast.close();
         toast({
           title: "Employee Deleted Successfully!",
           status: "success",
@@ -171,6 +197,7 @@ function useEmployeePage() {
         setFetchList((prev) => prev + 1);
         setPage(1);
       } catch (error) {
+        toast.close();
         toast({
           title: "Error Occured!",
           description: error.response.data.message,
