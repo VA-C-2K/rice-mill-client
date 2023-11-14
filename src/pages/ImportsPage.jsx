@@ -8,15 +8,14 @@ const Vehicle = React.lazy(() => import("./vehicle-page"));
 const Product = React.lazy(() => import("./product-page"));
 
 const ImportsPage = () => {
-  const { activeTab, setActiveTab, setFetchList, setSearchTerm, setPage } = GlobalState();
+  const { activeTab, setActiveTab, setFetchList, setSearchTerm, setPage } =
+    GlobalState();
   if (activeTab === "") {
-    setActiveTab("Vendor");
-  } else if (
-    [...Const.HOME_PAGES, ...Const.EXPORT_PAGES].includes(activeTab)
-  ) {
-    setActiveTab("Vendor");
+    setActiveTab("Row_Material_Entry");
+  } else if ([...Const.HOME_PAGES, ...Const.EXPORT_PAGES].includes(activeTab)) {
+    setActiveTab("Row_Material_Entry");
   } else if (!Const.IMPORT_PAGES.includes(activeTab)) {
-    setActiveTab("Vendor");
+    setActiveTab("Row_Material_Entry");
   }
   const handleTabChange = (index) => {
     setActiveTab(Const.IMPORT_PAGES[index]);
@@ -26,17 +25,27 @@ const ImportsPage = () => {
   };
 
   return (
-    <Tabs position="relative" isFitted variant="soft-rounded" onChange={(index) => handleTabChange(index)}>
+    <Tabs
+      position="relative"
+      isFitted
+      variant="soft-rounded"
+      onChange={(index) => handleTabChange(index)}
+    >
       <Box mx="4">
         <Box bg="#EDF1D6" w="100%" py={1} px={10} borderRadius={"3xl"}>
           <TabList m="2px">
-            {Const.IMPORT_PAGES.map((page,index) => (
-              <Tab _selected={{ color: "white", bg: "#609966" }} key={index}>{page}</Tab>
+            {Const.IMPORT_PAGES.map((page, index) => (
+              <Tab _selected={{ color: "white", bg: "#609966" }} key={index}>
+                {page}
+              </Tab>
             ))}
           </TabList>
         </Box>
       </Box>
       <TabPanels>
+        <TabPanel>
+          <RowMaterialPage />
+        </TabPanel>
         <TabPanel>
           <Vendor />
         </TabPanel>
@@ -45,9 +54,6 @@ const ImportsPage = () => {
         </TabPanel>
         <TabPanel>
           <Vehicle />
-        </TabPanel>
-        <TabPanel>
-          <RowMaterialPage />
         </TabPanel>
       </TabPanels>
     </Tabs>

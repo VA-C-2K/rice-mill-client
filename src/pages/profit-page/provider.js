@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import generateContext from "../../utils/generate-context";
 import { useToast } from "@chakra-ui/react";
 import axios from "axios";
 import { authConfig } from "../../api";
 import { baseURL } from "../../api";
 import { UserState } from "../../context/user-context";
+import { useNavigate } from "react-router-dom";
 
 function useProfitPage() {
     axios.defaults.withCredentials = true;
@@ -13,11 +14,13 @@ function useProfitPage() {
     const { user, token } = UserState();
     const config = authConfig(token);
     const [profitList, setProfitList] = useState([]);
+    const filterDateRef  = useRef({});
+    const navigate = useNavigate();
 
-    const getProfit = useCallback(async () => {
+    const getProfit = useCallback(async (searchTerm="") => {
         setLoading(true);
         try {
-            const data = await axios.get(`${baseURL}/profits`, {
+            const data = await axios.get(`${baseURL}/profits?${searchTerm}`, {
                 headers: config.headers,
             });
             setProfitList(data?.data);
@@ -35,11 +38,25 @@ function useProfitPage() {
         }
     }, [config.headers, toast]);
 
+    const handleViewRowProduct = useCallback(() => () => {
+        navigate("/imports")
+    }, [navigate]);
+
+    const handleViewSale = useCallback(() => () => {
+        navigate("/exports")
+    }, [navigate]);
+
+    const handleSearch = useCallback(() => {
+        const queryParams = new URLSearchParams(filterDateRef.current);
+        getProfit(queryParams?.toString());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
     useEffect(() => {
         if (user !== null) {
             getProfit();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     return useMemo(() => {
@@ -47,8 +64,12 @@ function useProfitPage() {
             loading,
             profitList,
             getProfit,
+            handleViewRowProduct,
+            handleViewSale,
+            handleSearch,
+            filterDateRef,
         };
-    }, [profitList, getProfit, loading]);
+    }, [loading, profitList, getProfit, handleViewRowProduct, handleViewSale, handleSearch, filterDateRef]);
 }
 
 export const [ProfitPageProvider, useProfitPageContext] = generateContext(useProfitPage);

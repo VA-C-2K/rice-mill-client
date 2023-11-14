@@ -8,11 +8,11 @@ const Sale = React.lazy(() => import("./sale-page"));
 const ExportsPage = () => {
   const { activeTab, setActiveTab, setFetchList, setSearchTerm, setPage } = GlobalState();
   if(activeTab === "") {
-    setActiveTab("Customer");
+    setActiveTab("Sales");
   }else if([...Const.IMPORT_PAGES,...Const.HOME_PAGES].includes(activeTab)){
-    setActiveTab("Customer");
+    setActiveTab("Sales");
   }else if(!Const.EXPORT_PAGES.includes(activeTab)){
-    setActiveTab("Customer");
+    setActiveTab("Sales");
   }
   const handleTabChange = (index) => {
     setActiveTab(Const.EXPORT_PAGES[index]);
@@ -34,10 +34,10 @@ const ExportsPage = () => {
       </Box>
       <TabPanels>
         <TabPanel>
-          <Cutomer />
+          <Sale />
         </TabPanel>
         <TabPanel>
-          <Sale />
+          <Cutomer />
         </TabPanel>
       </TabPanels>
     </Tabs>
