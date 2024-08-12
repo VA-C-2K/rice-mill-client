@@ -8,14 +8,17 @@ import withHOC from "../../utils/with-hoc";
 import TableSkeleton from "../../components/Skeleton";
 
 const EmployeeTable = (props) => {
-  const { employeeList, handleUpdateClick, handleDelete, loading } = useEmployeePageContext();
-  const { isUpdate, setIsUpdate, formik } = props;
+  const { employeeList, handleUpdateClick, loading } = useEmployeePageContext();
+  const { isUpdate, setIsUpdate, formik, handleDelete } = props;
+
   if (loading) {
     return <TableSkeleton NoRecordFound={false} />;
   }
   if (employeeList?.employees?.length === 0) {
     return <TableSkeleton NoRecordFound={true} />;
   }
+
+
   return (
     <Box bg="#EDF1D6" w="100%" h="100%" p={3} borderWidth={"1px"} borderRadius={"lg"}>
       <TableContainer>

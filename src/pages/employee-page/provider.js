@@ -1,98 +1,72 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import generateContext from "../../utils/generate-context";
-import { useToast } from "@chakra-ui/react";
-import axios from "axios";
-import { authConfig } from "../../api";
-import { baseURL } from "../../api";
-import { UserState } from "../../context/user-context";
+import { useCallback, useMemo } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { FIELD_NAMES, getInitialValues } from "./form-helper";
+import generateContext from "../../utils/generate-context";
 import { GlobalState } from "../../context/global-context";
+import { useEmployeeApi } from "../../api/hooks/employee-api";
+import { useCustomToast } from "../../hooks/use-toast";
 
-function useEmployeePage() {
-  axios.defaults.withCredentials = true;
-  const toast = useToast();
-  const { activeTab, fetchList, setFetchList, searchTerm, page, setPage } = GlobalState();
-  const [loading, setLoading] = useState(false);
-  const { user, token } = UserState();
-  const config = authConfig(token);
-  const [employeeList, setEmployeeList] = useState([]);
+export function useEmployeePage() {
+  const { activeTab, searchTerm, page, setPage } = GlobalState();
+  const queryClient = useQueryClient();
+  const employeeApi = useEmployeeApi();
+  const { showErrorToast, showSuccessToast } = useCustomToast();
 
-  const getEmployees = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await axios.get(`${baseURL}/employee?term=${searchTerm}&page=${page}`, {
-        headers: config.headers,
-      });
-      setEmployeeList(data?.data);
-      setLoading(false);
-    } catch (error) {
-      toast({
-        title: "Error Occurred!",
-        description: error.response.data.message,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
-      setLoading(false);
-    }
-  }, [searchTerm, page, config.headers, toast]);
+  const { data: employeeList, isLoading } = useQuery({
+    queryKey: ["employees", { term: searchTerm, page }],
+    queryFn: () => employeeApi.getEmployees({ term: searchTerm, page }),
+    enabled: activeTab === "Employee",
+    refetchInterval: 60000,
+    onError: (error) => {
+      if (error.name === "CancelledError") return;
+      showErrorToast("Error Occurred!", error.response?.data?.message);
+    },
+  });
+
+  const createMutation = useMutation({
+    mutationFn: employeeApi.createEmployee,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      showSuccessToast("Employee Created Successfully!");
+    },
+    onError: (error) => {
+      showErrorToast("Error Occurred!", error.response?.data?.message);
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: employeeApi.updateEmployee,
+    onSuccess: () => {
+      queryClient.invalidateQueries("employees");
+      showSuccessToast("Employee Updated Successfully!");
+    },
+    onError: (error) => {
+      showErrorToast("Error Occurred!", error.response?.data?.message);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: employeeApi.deleteEmployee,
+    onSuccess: () => {
+      queryClient.invalidateQueries("employees");
+      showSuccessToast("Employee Deleted Successfully!");
+      setPage(1);
+    },
+    onError: (error) => {
+      showErrorToast("Error Occurred!", error.response?.data?.message);
+    },
+  });
 
   const handleCreate = useCallback(
     async (values, actions, onClose) => {
-      const { address, first_name, last_name, phone_number, salary, aadhar_card_no, no_of_leaves, role, over_time_hrs } = values;
-      toast({
-        title:"Creating...",
-        status:"loading",
-        duration: 500,
-        isClosable: true,
-        position: "bottom",
+      createMutation.mutate(values, {
+        onSuccess: () => {
+          actions.resetForm();
+          onClose(false);
+        },
       });
-      setLoading(true);
-      try {
-        await axios.post(
-          `${baseURL}/employee/create`,
-          {
-            first_name,
-            last_name,
-            phone_number,
-            address,
-            salary,
-            aadhar_card_no,
-            no_of_leaves,
-            role,
-            over_time_hrs,
-          },
-          {
-            headers: config.headers,
-          }
-        );
-        toast.close();
-        toast({
-          title: "Employee Created Successfully!",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        setLoading(false);
-        actions.resetForm();
-        onClose(false);
-        setFetchList((prev) => prev + 1);
-      } catch (error) {
-        toast.close();
-        toast({
-          title: "Error Occured!",
-          description: error.response.data.message,
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        setLoading(false);
-      }
     },
-    [config.headers, toast, setFetchList]
+    [createMutation]
   );
 
   const handleUpdateClick = useCallback(
@@ -101,137 +75,42 @@ function useEmployeePage() {
         values: getInitialValues(),
       });
       formik.setFieldValue(`${FIELD_NAMES.EMP_ID}`, id);
-      const data = await axios.get(`${baseURL}/employee?emp_id=${id}`, {
-        headers: config.headers,
-      });
-      const values = getInitialValues(data?.data);
+      const data = await employeeApi.getEmployeeById(id);
+      const values = getInitialValues(data);
       Object.entries(values).forEach(([key, value]) => {
         formik.setFieldValue(key, value);
       });
       setIsUpdate(!isUpdate);
     },
-    [config.headers]
+    [employeeApi]
   );
 
   const handleUpdate = useCallback(
     async (values, actions, setIsUpdate) => {
-      toast({
-        title:"Updating...",
-        status:"loading",
-        duration: 500,
-        isClosable: true,
-        position: "bottom",
+      updateMutation.mutate(values, {
+        onSuccess: () => {
+          actions.resetForm();
+          setIsUpdate(false);
+        },
       });
-      const { emp_id, address, first_name, last_name, phone_number, salary, aadhar_card_no, no_of_leaves, role, over_time_hrs } = values;
-      setLoading(true);
-      try {
-        await axios.put(
-          `${baseURL}/employee/update`,
-          {
-            emp_id,
-            address,
-            first_name,
-            last_name,
-            phone_number,
-            salary,
-            aadhar_card_no,
-            no_of_leaves,
-            role,
-            over_time_hrs,
-          },
-          {
-            headers: config.headers,
-          }
-        );
-        toast.close();
-        toast({
-          title: "Employee Updated Successfully!",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        setLoading(false);
-        actions.resetForm();
-        setIsUpdate(false);
-        setFetchList((prev) => prev + 1);
-      } catch (error) {
-        toast.close();
-        toast({
-          title: "Error Occured!",
-          description: error.response.data.message,
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        setLoading(false);
-      }
     },
-    [config.headers, setFetchList, toast]
+    [updateMutation]
   );
-
-  const handleDelete = useCallback(
-    async (id) => {
-      setLoading(true);
-      toast({
-        title:"Deleting...",
-        status:"loading",
-        duration: 500,
-        isClosable: true,
-        position: "bottom",
-      });
-      try {
-        await axios.delete(`${baseURL}/employee/delete?emp_id=${id}`, {
-          headers: config.headers,
-        });
-        toast.close();
-        toast({
-          title: "Employee Deleted Successfully!",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        setLoading(false);
-        setFetchList((prev) => prev + 1);
-        setPage(1);
-      } catch (error) {
-        toast.close();
-        toast({
-          title: "Error Occured!",
-          description: error.response.data.message,
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        setLoading(false);
-      }
-    },
-    [config.headers, setFetchList, setPage, toast]
-  );
-
-  useEffect(() => {
-    if (activeTab === "Employee") {
-      if (user !== null) {
-        getEmployees();
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, page, fetchList, activeTab,searchTerm]);
 
   return useMemo(() => {
     return {
-      loading,
+      loading:
+        isLoading ||
+        createMutation.isLoading ||
+        updateMutation.isLoading ||
+        deleteMutation.isLoading,
       employeeList,
       handleCreate,
       handleUpdateClick,
-      handleDelete,
-      getEmployees,
       handleUpdate,
+      deleteMutation,
     };
-  }, [loading, employeeList, handleCreate, handleUpdateClick, handleDelete, getEmployees, handleUpdate]);
+  }, [isLoading, createMutation.isLoading, updateMutation.isLoading, deleteMutation, employeeList, handleCreate, handleUpdateClick, handleUpdate]);
 }
 
 export const [EmployeePageProvider, useEmployeePageContext] = generateContext(useEmployeePage);

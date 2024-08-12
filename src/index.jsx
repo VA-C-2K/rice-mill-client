@@ -5,16 +5,24 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { BrowserRouter } from "react-router-dom";
 import UserProvider from "./context/user-context";
 import GlobalProvider from "./context/global-context";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AxiosProvider } from "./context/axios-context";
+
+const queryClient = new QueryClient();
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <ChakraProvider>
     <BrowserRouter>
-      <UserProvider>
-        <GlobalProvider>
-          <App />
-        </GlobalProvider>
-      </UserProvider>
+      <QueryClientProvider client={queryClient}>
+        <AxiosProvider>
+          <UserProvider>
+            <GlobalProvider>
+              <App />
+            </GlobalProvider>
+          </UserProvider>
+        </AxiosProvider>
+      </QueryClientProvider>
     </BrowserRouter>
   </ChakraProvider>
 );
