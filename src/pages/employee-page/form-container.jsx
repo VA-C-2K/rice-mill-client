@@ -41,7 +41,7 @@ const FormContainer = (props) => {
             <ModalContent bg="#EDF1D6" p={2} width={"full"}>
               <ModalHeader>
                 <Text as="b" fontSize="xl" fontFamily="Work sans" color="#40513B">
-                  {isUpdate ? "Update Customer Details" : "Add Customer Details"}
+                  {isUpdate ? "Update Employee Details" : "Add Employee Details"}
                 </Text>
               </ModalHeader>
               {!isUpdate && <ModalCloseButton />}
