@@ -10,10 +10,10 @@ import FormikInput from "../../components/FormikInput";
 import FormikRadioButton from "../../components/FormikRadioButton";
 import SearchField from "../../components/searchFeild";
 import Pagination from "../../components/Pagination";
-import { GlobalState } from "../../context/global-context";
+import { useGloabalInfo } from "../../context/global-context";
 
 const FormContainer = (props) => {
-  const { setSearchTerm, searchTerm, setPage } = GlobalState();
+  const { setSearchTerm, searchTerm, setPage } = useGloabalInfo();
   const { loading, vendorList } = useVendorPageContext();
   const { isUpdate, setIsUpdate, formik, isOpen, onOpen, onClose } = props;
 

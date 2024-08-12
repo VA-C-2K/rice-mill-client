@@ -4,18 +4,18 @@ import { useToast } from "@chakra-ui/react";
 import axios from "axios";
 import { authConfig } from "../../api";
 import { baseURL } from "../../api";
-import { UserState } from "../../context/user-context";
+import { useUserInfo } from "../../context/user-context";
 import { FIELD_NAMES, getInitialValues } from "./form-helper";
-import { GlobalState } from "../../context/global-context";
+import { useGloabalInfo } from "../../context/global-context";
 
 function useProductPage() {
   axios.defaults.withCredentials = true;
   const toast = useToast();
-  const [loading, setLoading] = useState(false);
-  const { user, token } = UserState();
+  const { activeTab, fetchList, setFetchList } = useGloabalInfo();
+  const { user, token } = useUserInfo();
   const config = authConfig(token);
+  const [loading, setLoading] = useState(false);
   const [productList, setProductList] = useState([]);
-  const { activeTab, fetchList, setFetchList } = GlobalState();
 
   const getProducts = useCallback(async () => {
     setLoading(true);

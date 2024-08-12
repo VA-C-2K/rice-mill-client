@@ -1,12 +1,12 @@
 import React from "react";
 import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
-import { GlobalState } from "../context/global-context";
+import { useGloabalInfo } from "../context/global-context";
 import { Const } from "../constants";
 const Cutomer = React.lazy(() => import("./customer-page"));
 const Sale = React.lazy(() => import("./sale-page"));
 
 const ExportsPage = () => {
-  const { activeTab, setActiveTab, setFetchList, setSearchTerm, setPage } = GlobalState();
+  const { activeTab, setActiveTab, setFetchList, setSearchTerm, setPage } = useGloabalInfo();
   if(activeTab === "") {
     setActiveTab("Sales");
   }else if([...Const.IMPORT_PAGES,...Const.HOME_PAGES].includes(activeTab)){

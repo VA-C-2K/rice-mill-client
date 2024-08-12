@@ -1,19 +1,20 @@
 import React, { useEffect } from "react";
 import { Container, Box, Text, Tabs, TabList, Tab, TabPanels, TabPanel } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-// import IconApp from '../asset/icons.png';
+import { useUserInfo } from "../../context/user-context";
 const Login = React.lazy(() => import("./Login"));
 const Signup = React.lazy(() => import("./Signup"));
 
 const AuthPage = () => {
   const navigate = useNavigate();
+  const { user } = useUserInfo();
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("userInfo"));
     if (user) {
       navigate("/home");
     }
-  }, [navigate]);
+  }, [navigate, user]);
+
   return (
     <Container maxW="xl" centerContent mt="200px">
       <Box display="flex" justifyContent="center" p={3} w="100%" m="40px 0 15px 0" borderRadius="lg" borderWidth="1px" bg="#EDF1D6">

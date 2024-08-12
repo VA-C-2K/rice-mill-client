@@ -24,10 +24,10 @@ import withHOC from "../../utils/with-hoc";
 import FormikInput from "../../components/FormikInput";
 import SearchField from "../../components/searchFeild";
 import Pagination from "../../components/Pagination";
-import { GlobalState } from "../../context/global-context";
+import { useGloabalInfo } from "../../context/global-context";
 
 const FormContainer = (props) => {
-  const { searchTerm, setPage, setSearchTerm } = GlobalState();
+  const { searchTerm, setPage, setSearchTerm } = useGloabalInfo();
   const { loading, dailyExpenseList } = useDailyExpensePageContext();
   const { isUpdate, setIsUpdate, formik, isOpen, onOpen, onClose } = props;
 

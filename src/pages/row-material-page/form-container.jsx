@@ -21,11 +21,11 @@ import { RowMaterialPageProvider, useRowMaterialPageContext } from "./provider";
 import withHOC from "../../utils/with-hoc";
 import FormikInput from "../../components/FormikInput";
 import Pagination from "../../components/Pagination";
-import { GlobalState } from "../../context/global-context";
+import { useGloabalInfo } from "../../context/global-context";
 import { TypeOfMaterial } from "../../constants";
 
 const FormContainer = (props) => {
-  const { setPage } = GlobalState();
+  const { setPage } = useGloabalInfo();
   const { loading, vendorList,vehicleList, rowMaterialList } = useRowMaterialPageContext();
   const { isUpdate, setIsUpdate, formik, isOpen, onOpen, onClose } = props;
 

@@ -4,16 +4,16 @@ import { useToast } from "@chakra-ui/react";
 import axios from "axios";
 import { authConfig } from "../../api";
 import { baseURL } from "../../api";
-import { UserState } from "../../context/user-context";
+import { useUserInfo } from "../../context/user-context";
 import { FIELD_NAMES, getInitialValues } from "./form-helper";
-import { GlobalState } from "../../context/global-context";
+import { useGloabalInfo } from "../../context/global-context";
 
 function useSalePage() {
   axios.defaults.withCredentials = true;
   const toast = useToast();
-  const { activeTab, fetchList, setFetchList, searchTerm, page, setPage } = GlobalState();
+  const { activeTab, fetchList, setFetchList, searchTerm, page, setPage } = useGloabalInfo();
   const [loading, setLoading] = useState(false);
-  const { user, token } = UserState();
+  const { user, token } = useUserInfo();
   const config = authConfig(token);
   const [prodList, setProdList] = useState([]);
   const [custList, setCustList] = useState([]);

@@ -1,10 +1,11 @@
 /* eslint-disable react/prop-types */
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const UserContext = createContext();
+const UserContext = createContext(null);
 
-const UserProvider = ({ children }) => {
+export const UserProvider = ({ children }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState();
   const [token, setToken] = useState();
@@ -27,8 +28,6 @@ const UserProvider = ({ children }) => {
   );
 };
 
-export const UserState = () => {
+export const useUserInfo = () => {
   return useContext(UserContext);
 };
-
-export default UserProvider;

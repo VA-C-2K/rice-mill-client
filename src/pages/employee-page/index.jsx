@@ -27,34 +27,32 @@ const Employee = () => {
   }, [setCurrentEmpId, setIsModalOpen]);
 
   return (
-    <>
-      <Formik
-        initialValues={getInitialValues()}
-        validationSchema={getValidation()}
-        onSubmit={(values, actions) => {
-          if (isUpdate) {
-            handleUpdate(values, actions, setIsUpdate);
-          } else {
-            handleCreate(values, actions, onClose);
-          }
-        }}
-        validateOnMount={true}
-        enableReinitialize={true}
-      >
-        {(formik) => (
-          <>
-            <FormContainer isUpdate={isUpdate} setIsUpdate={setIsUpdate} formik={formik} isOpen={isOpen} onOpen={onOpen} onClose={onClose} />
-            <EmployeeTable isUpdate={isUpdate} setIsUpdate={setIsUpdate} formik={formik} handleDelete={handleDelete} />
-            <ConfirmationModal
-              isOpen={isModalOpen}
-              onClose={() => setIsModalOpen(false)}
-              onConfirm={confirmDelete}
-              question={"Are you sure you want to delete this employee?"}
-            />
-          </>
-        )}
-      </Formik>
-    </>
+    <Formik
+      initialValues={getInitialValues()}
+      validationSchema={getValidation()}
+      onSubmit={(values, actions) => {
+        if (isUpdate) {
+          handleUpdate(values, actions, setIsUpdate);
+        } else {
+          handleCreate(values, actions, onClose);
+        }
+      }}
+      validateOnMount={true}
+      enableReinitialize={true}
+    >
+      {(formik) => (
+        <>
+          <FormContainer isUpdate={isUpdate} setIsUpdate={setIsUpdate} formik={formik} isOpen={isOpen} onOpen={onOpen} onClose={onClose} />
+          <EmployeeTable isUpdate={isUpdate} setIsUpdate={setIsUpdate} formik={formik} handleDelete={handleDelete} />
+          <ConfirmationModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onConfirm={confirmDelete}
+            question={"Are you sure you want to delete this employee?"}
+          />
+        </>
+      )}
+    </Formik>
   );
 };
 

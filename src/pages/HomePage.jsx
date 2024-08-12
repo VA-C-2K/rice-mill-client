@@ -1,13 +1,12 @@
 import React from "react";
 import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
-import { GlobalState } from "../context/global-context";
+import { useGloabalInfo } from "../context/global-context";
 import { Const } from "../constants";
 import DailyExpensePage from "./daily-expense-page";
 const Employee = React.lazy(() => import("./employee-page/index.jsx"));
 
 const HomePage = () => {
-  const { activeTab, setActiveTab, setFetchList, setSearchTerm, setPage } =
-    GlobalState();
+  const { activeTab, setActiveTab, setFetchList, setSearchTerm, setPage } = useGloabalInfo();
   if (activeTab === "") {
     setActiveTab("Employee");
   } else if (

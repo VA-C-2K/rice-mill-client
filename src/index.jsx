@@ -3,10 +3,10 @@ import "./index.css";
 import App from "./App";
 import { ChakraProvider } from "@chakra-ui/react";
 import { BrowserRouter } from "react-router-dom";
-import UserProvider from "./context/user-context";
-import GlobalProvider from "./context/global-context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AxiosProvider } from "./context/axios-context";
+import { UserProvider } from "./context/user-context";
+import { GlobalProvider } from "./context/global-context";
 
 const queryClient = new QueryClient();
 

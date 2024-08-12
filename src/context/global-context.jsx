@@ -1,16 +1,17 @@
 /* eslint-disable react/prop-types */
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState } from "react";
 
-const GlobalStateContext = createContext();
+const useGloabalInfoContext = createContext(null);
 
-const GlobalProvider = ({ children }) => {
+export const GlobalProvider = ({ children }) => {
   const [activeTab, setActiveTab] = useState("");
   const [fetchList, setFetchList] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
 
   return (
-    <GlobalStateContext.Provider
+    <useGloabalInfoContext.Provider
       value={{
         activeTab,
         setActiveTab,
@@ -23,12 +24,8 @@ const GlobalProvider = ({ children }) => {
       }}
     >
       <>{children}</>
-    </GlobalStateContext.Provider>
+    </useGloabalInfoContext.Provider>
   );
 };
 
-export const GlobalState = () => {
-  return useContext(GlobalStateContext);
-};
-
-export default GlobalProvider;
+export const useGloabalInfo = () => useContext(useGloabalInfoContext);

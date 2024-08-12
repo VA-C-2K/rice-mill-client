@@ -21,12 +21,12 @@ import { SalePageProvider, useSalePageContext } from "./provider";
 import withHOC from "../../utils/with-hoc";
 import FormikInput from "../../components/FormikInput";
 import Pagination from "../../components/Pagination";
-import { GlobalState } from "../../context/global-context";
+import { useGloabalInfo } from "../../context/global-context";
 import { capitalizedString } from "../../utils/string-helper";
 import { useToast } from "@chakra-ui/react";
 
 const FormContainer = (props) => {
-  const { setPage } = GlobalState();
+  const { setPage } = useGloabalInfo();
   const toast = useToast();
   const { loading, prodList, custList, vehicleList, salesList } =
     useSalePageContext();

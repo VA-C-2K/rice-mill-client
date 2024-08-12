@@ -4,14 +4,14 @@ import { useToast } from "@chakra-ui/react";
 import axios from "axios";
 import { authConfig } from "../../api";
 import { baseURL } from "../../api";
-import { UserState } from "../../context/user-context";
+import { useUserInfo } from "../../context/user-context";
 import { useNavigate } from "react-router-dom";
 
 function useProfitPage() {
     axios.defaults.withCredentials = true;
     const toast = useToast();
     const [loading, setLoading] = useState(false);
-    const { user, token } = UserState();
+    const { user, token } = useUserInfo();
     const config = authConfig(token);
     const [profitList, setProfitList] = useState([]);
     const filterDateRef  = useRef({});

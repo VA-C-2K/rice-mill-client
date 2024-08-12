@@ -2,12 +2,12 @@ import { useCallback, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { FIELD_NAMES, getInitialValues } from "./form-helper";
 import generateContext from "../../utils/generate-context";
-import { GlobalState } from "../../context/global-context";
+import { useGloabalInfo } from "../../context/global-context";
 import { useEmployeeApi } from "../../api/hooks/employee-api";
 import { useCustomToast } from "../../hooks/use-toast";
 
 export function useEmployeePage() {
-  const { activeTab, searchTerm, page, setPage } = GlobalState();
+  const { activeTab, searchTerm, page, setPage } = useGloabalInfo();
   const queryClient = useQueryClient();
   const employeeApi = useEmployeeApi();
   const { showErrorToast, showSuccessToast } = useCustomToast();
