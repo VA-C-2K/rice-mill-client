@@ -34,7 +34,7 @@ const SearchField = ({ searchBy, loading, setSearchTerm }) => {
         color="#609966"
         fontWeight={500}
         border="1px"
-        bg="white"
+        bg="#EDF1D6"
         width="100%"
       />
       <InputRightElement>

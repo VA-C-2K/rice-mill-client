@@ -1,5 +1,6 @@
+/* eslint-disable react-refresh/only-export-components */
 import { InputRightElement, VStack } from "@chakra-ui/react";
-import React, { useState } from "react";
+import { useState } from "react";
 import CustomButton from "../../components/CustomButton";
 import { Formik } from "formik";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";

@@ -15,7 +15,7 @@ const AuthPage = () => {
     }
   }, [navigate]);
   return (
-    <Container maxW="xl" centerContent>
+    <Container maxW="xl" centerContent mt="200px">
       <Box display="flex" justifyContent="center" p={3} w="100%" m="40px 0 15px 0" borderRadius="lg" borderWidth="1px" bg="#EDF1D6">
         {/* <Image src={IconApp} height={50} width={50} alt={"Icon"}/> */}
         <Text as="b" fontSize="4xl" fontFamily="Work sans" color="#40513B">

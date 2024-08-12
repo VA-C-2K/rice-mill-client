@@ -1,5 +1,6 @@
+/* eslint-disable react-refresh/only-export-components */
+/* eslint-disable react/prop-types */
 import { Box, Flex, HStack, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Stack, Text, VStack } from "@chakra-ui/react";
-import React from "react";
 import CustomButton from "../../components/CustomButton";
 import { AddIcon } from "@chakra-ui/icons";
 import { FIELD_NAMES, getInitialValues } from "./form-helper";
