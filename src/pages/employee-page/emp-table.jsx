@@ -6,10 +6,12 @@ import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { EmployeePageProvider, useEmployeePageContext } from "./provider";
 import withHOC from "../../utils/with-hoc";
 import TableSkeleton from "../../components/Skeleton";
+import { useFormikContext } from "formik";
 
 const EmployeeTable = (props) => {
   const { employeeList, handleUpdateClick, loading } = useEmployeePageContext();
-  const { isUpdate, setIsUpdate, formik, handleDelete } = props;
+  const { isUpdate, setIsUpdate, handleDelete } = props;
+  const formik = useFormikContext();
 
   if (loading) {
     return <TableSkeleton NoRecordFound={false} />;
