@@ -7,27 +7,28 @@ export const useEmployeeApi = () => {
   return {
     getEmployees: async (queryObj) => {
       const queryString = objectToQueryString(queryObj);
-      const { data } = await axios.get(`/employee?${queryString}`);
+      const { data } = await axios.get(`/employees?${queryString}`);
       return data;
     },
 
     createEmployee: async (employeeData) => {
-      const { data } = await axios.post('/employee/create', employeeData);
+      const { data } = await axios.post('/employees', employeeData);
       return data;
     },
 
     updateEmployee: async (employeeData) => {
-      const { data } = await axios.put('/employee/update', employeeData);
+      const { emp_id: empId, ...payload } = employeeData;
+      const { data } = await axios.put(`/employees/${empId}`, payload);
       return data;
     },
 
     deleteEmployee: async (empId) => {
-      const { data } = await axios.delete(`/employee/delete?emp_id=${empId}`);
+      const { data } = await axios.delete(`/employees/${empId}`);
       return data;
     },
 
     getEmployeeById: async (empId) => {
-      const { data } = await axios.get(`/employee?emp_id=${empId}`);
+      const { data } = await axios.get(`/employees/${empId}`);
       return data;
     }
   };

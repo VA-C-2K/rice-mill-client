@@ -14,7 +14,7 @@ import { useFormikContext } from "formik";
 
 const FormContainer = (props) => {
   const { setSearchTerm, searchTerm, setPage } = useGloabalInfo();
-  const { loading, employeeList } = useEmployeePageContext();
+  const { loading, getEmployeesQuery } = useEmployeePageContext();
   const { isUpdate, setIsUpdate, isOpen, onOpen, onClose } = props;
   const { resetForm } = useFormikContext();
 
@@ -41,7 +41,7 @@ const FormContainer = (props) => {
           <EditForm isOpen={isOpen} onClose={onClose} isUpdate={isUpdate} setIsUpdate={setIsUpdate} loading={loading} />
         </Box>
       </Flex>
-      <Pagination setPage={setPage} currentPage={Number(employeeList?.currentPage)} totalPages={employeeList?.totalPages} />
+      <Pagination setPage={setPage} currentPage={getEmployeesQuery?.data?.pagination?.current_page} totalPages={getEmployeesQuery?.data?.pagination?.total_pages} />
     </>
   );
 };

@@ -9,14 +9,14 @@ import TableSkeleton from "../../components/Skeleton";
 import { useFormikContext } from "formik";
 
 const EmployeeTable = (props) => {
-  const { employeeList, handleUpdateClick, loading } = useEmployeePageContext();
+  const { getEmployeesQuery, handleUpdateClick, loading } = useEmployeePageContext();
   const { isUpdate, setIsUpdate, handleDelete } = props;
   const formik = useFormikContext();
 
   if (loading) {
     return <TableSkeleton NoRecordFound={false} />;
   }
-  if (employeeList?.employees?.length === 0) {
+  if (getEmployeesQuery?.data?.data?.length === 0) {
     return <TableSkeleton NoRecordFound={true} />;
   }
 
@@ -93,7 +93,7 @@ const EmployeeTable = (props) => {
             </Tr>
           </Thead>
           <Tbody justifyContent={"center"}>
-            {employeeList?.employees?.map((employee, index) => (
+            {getEmployeesQuery?.data?.data?.map((employee, index) => (
               <Tr key={employee._id}>
                 <Td>{index + 1}</Td>
                 <Td>

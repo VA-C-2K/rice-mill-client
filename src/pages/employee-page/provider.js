@@ -3,8 +3,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { FIELD_NAMES, getInitialValues } from "./form-helper";
 import generateContext from "../../utils/generate-context";
 import { useGloabalInfo } from "../../context/global-context";
-import { useEmployeeApi } from "../../api/hooks/employee-api";
 import { useCustomToast } from "../../hooks/use-toast";
+import { useEmployeeApi } from "../../api/hooks/use-employee-api";
 
 export function useEmployeePage() {
   const { activeTab, searchTerm, page, setPage } = useGloabalInfo();
@@ -12,16 +12,21 @@ export function useEmployeePage() {
   const employeeApi = useEmployeeApi();
   const { showErrorToast, showSuccessToast } = useCustomToast();
 
-  const { data: employeeList, isLoading } = useQuery({
+  const getEmployeesQuery = useQuery({
     queryKey: ["employees", { term: searchTerm, page }],
     queryFn: () => employeeApi.getEmployees({ term: searchTerm, page }),
     enabled: activeTab === "Employee",
     refetchInterval: 60000,
+    select: (data) => ({
+      data: data?.data || [],
+      pagination: data?.paging || {},
+    }),
     onError: (error) => {
       if (error.name === "CancelledError") return;
       showErrorToast("Error Occurred!", error.response?.data?.message);
     },
   });
+  console.log('getEmployeesQuery: ', getEmployeesQuery);
 
   const createMutation = useMutation({
     mutationFn: employeeApi.createEmployee,
@@ -100,17 +105,26 @@ export function useEmployeePage() {
   return useMemo(() => {
     return {
       loading:
-        isLoading ||
+        getEmployeesQuery.isLoading ||
         createMutation.isLoading ||
         updateMutation.isLoading ||
         deleteMutation.isLoading,
-      employeeList,
+      getEmployeesQuery,
       handleCreate,
       handleUpdateClick,
       handleUpdate,
       deleteMutation,
     };
-  }, [isLoading, createMutation.isLoading, updateMutation.isLoading, deleteMutation, employeeList, handleCreate, handleUpdateClick, handleUpdate]);
+  }, [
+    getEmployeesQuery,
+    createMutation.isLoading,
+    updateMutation.isLoading,
+    deleteMutation,
+    handleCreate,
+    handleUpdateClick,
+    handleUpdate,
+  ]);
 }
 
-export const [EmployeePageProvider, useEmployeePageContext] = generateContext(useEmployeePage);
+export const [EmployeePageProvider, useEmployeePageContext] =
+  generateContext(useEmployeePage);
