@@ -1,122 +1,91 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import generateContext from "../../utils/generate-context";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@chakra-ui/react";
-import axios from "axios";
-import { config } from "../../api";
-import { login, signUp } from "../../api";
+import { useMutation } from "@tanstack/react-query";
+import { useAuthApi } from "../../api/hooks/use-auth-api";
+import { useCustomToast } from "../../hooks/use-toast";
 
 function useAuthPage() {
-  axios.defaults.withCredentials = true;
-  const toast = useToast();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const authApi = useAuthApi();
+  const { showErrorToast, showLoadingToast, showSuccessToast } =
+    useCustomToast();
+
+  const loginMutation = useMutation({
+    mutationFn: authApi.login,
+    onMutate: () => {
+      showLoadingToast("Logging in...");
+    },
+    onSuccess: (data) => {
+      const user = {
+        username: data.name,
+        uid: data._id,
+      };
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("token", JSON.stringify(data.token));
+      showSuccessToast("Login Successful");
+    },
+    onError: (error) => {
+      showErrorToast("Error Occurred!", error.response?.data?.message);
+    },
+  });
+
+  const signUpMutation = useMutation({
+    mutationFn: authApi.signUp,
+    onMutate: () => {
+      showLoadingToast("Signing Up...");
+    },
+    onSuccess: (data) => {
+      const user = {
+        username: data.name,
+        uid: data._id,
+      };
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("token", JSON.stringify(data.token));
+      showSuccessToast("Registration Successful");
+    },
+    onError: (error) => {
+      showErrorToast("Error Occurred!", error.response?.data?.message);
+    },
+  });
 
   const handleLogin = useCallback(
-    async (values, actions) => {
-      toast({
-        title:"Logging in...",
-        status:"loading",
-        duration: 500,
-        isClosable: true,
-        position: "bottom",
+    (values, actions) => {
+      loginMutation.mutate(values, {
+        onSuccess: () => {
+          actions.resetForm();
+          navigate("/home");
+        },
       });
-      const { phonenumber, password } = values;
-      setLoading(true);
-      try {
-        const { data } = await axios.post(login(), { password, phonenumber }, config());
-        toast.close();
-        toast({
-          title: "Login Successful",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        const user = {
-          username: data.name,
-          uid: data._id,
-        };
-        localStorage.setItem("user", JSON.stringify(user));
-        localStorage.setItem("token", JSON.stringify(data.token));
-        setLoading(false);
-        actions.resetForm();
-        navigate("/home");
-      } catch (error) {
-        toast.close();
-        toast({
-          title: "Error Occured!",
-          description: error.response.data.message,
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        setLoading(false);
-      }
     },
-    [navigate, toast]
+    [loginMutation, navigate]
   );
 
   const handleSignUp = useCallback(
     async (values, actions) => {
-      toast({
-        title:"Signing Up...",
-        status:"loading",
-        duration: 500,
-        isClosable: true,
-        position: "bottom",
+      signUpMutation.mutate(values, {
+        onSuccess: () => {
+          actions.resetForm();
+          navigate("/home");
+        },
       });
-      const { username, phonenumber, password } = values;
-      setLoading(true);
-      try {
-        const { data } = await axios.post(
-          signUp(),
-          {
-            name: username,
-            password,
-            phonenumber,
-          },
-          config()
-        );
-        toast.close();
-        toast({
-          title: "Registration Successful",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        const user = {
-          username: data.name,
-          uid: data._id,
-        };
-        localStorage.setItem("user", JSON.stringify(user));
-        localStorage.setItem("token", JSON.stringify(data.token));
-        actions.resetForm();
-        navigate("/home");
-      } catch (error) {
-        toast.close();
-        toast({
-          title: "Error Occured!",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        setLoading(false);
-      }
     },
-    [navigate, toast]
+    [navigate, signUpMutation]
   );
 
   return useMemo(() => {
     return {
-      loading,
+      loading: loginMutation.isLoading || signUpMutation.isLoading,
       handleLogin,
       handleSignUp,
     };
-  }, [loading, handleLogin, handleSignUp]);
+  }, [
+    loginMutation.isLoading,
+    signUpMutation.isLoading,
+    handleLogin,
+    handleSignUp,
+  ]);
 }
 
-export const [AuthPageProvider, useAuthPageContext] = generateContext(useAuthPage);
+export const [AuthPageProvider, useAuthPageContext] =
+  generateContext(useAuthPage);

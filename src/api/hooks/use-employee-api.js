@@ -3,7 +3,6 @@ import { objectToQueryString } from '../../utils/object-to-query-params';
 
 export const useEmployeeApi = () => {
   const axios = useAxios();
-
   return {
     getEmployees: async (queryObj) => {
       const queryString = objectToQueryString(queryObj);

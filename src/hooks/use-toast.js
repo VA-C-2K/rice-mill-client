@@ -19,20 +19,29 @@ export const useCustomToast = () => {
 
   return {
     showSuccessToast: useCallback((title, description) => {
+      toast.closeAll();
       showToast({ title, description, status: "success" });
-    }, [showToast]),
+    }, [showToast, toast]),
 
     showErrorToast: useCallback((title, description) => {
+      toast.closeAll();
       showToast({ title, description, status: "error" });
-    }, [showToast]),
+    }, [showToast, toast]),
 
     showInfoToast: useCallback((title, description) => {
+      toast.closeAll();
       showToast({ title, description, status: "info" });
-    }, [showToast]),
+    }, [showToast, toast]),
 
     showWarningToast: useCallback((title, description) => {
+      toast.closeAll();
       showToast({ title, description, status: "warning" });
-    }, [showToast]),
+    }, [showToast, toast]),
+    
+    showLoadingToast: useCallback((title, description) => {
+      toast.closeAll();
+      showToast({ title, description, status: "loading" });
+    }, [showToast, toast]),
 
     showCustomToast: showToast,
   };

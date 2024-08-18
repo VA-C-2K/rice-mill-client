@@ -16,7 +16,7 @@ export function useEmployeePage() {
     queryKey: ["employees", { term: searchTerm, page }],
     queryFn: () => employeeApi.getEmployees({ term: searchTerm, page }),
     enabled: activeTab === "Employee",
-    refetchInterval: 60000,
+    refetchInterval: false,
     select: (data) => ({
       data: data?.data || [],
       pagination: data?.paging || {},
@@ -26,7 +26,6 @@ export function useEmployeePage() {
       showErrorToast("Error Occurred!", error.response?.data?.message);
     },
   });
-  console.log('getEmployeesQuery: ', getEmployeesQuery);
 
   const createMutation = useMutation({
     mutationFn: employeeApi.createEmployee,
