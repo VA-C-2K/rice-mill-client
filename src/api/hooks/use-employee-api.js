@@ -16,18 +16,18 @@ export const useEmployeeApi = () => {
     },
 
     updateEmployee: async (employeeData) => {
-      const { emp_id: empId, ...payload } = employeeData;
-      const { data } = await axios.put(`/employees/${empId}`, payload);
+      const { emp_id: id, ...payload } = employeeData;
+      const { data } = await axios.put(`/employees/${id}`, payload);
       return data;
     },
 
-    deleteEmployee: async (empId) => {
-      const { data } = await axios.delete(`/employees/${empId}`);
+    deleteEmployee: async (id) => {
+      const { data } = await axios.delete(`/employees/${id}`);
       return data;
     },
 
-    getEmployeeById: async (empId) => {
-      const { data } = await axios.get(`/employees/${empId}`);
+    getEmployeeById: async (id) => {
+      const { data } = await axios.get(`/employees/${id}`);
       return data;
     }
   };

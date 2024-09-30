@@ -1,220 +1,126 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import generateContext from "../../utils/generate-context";
-import { useToast } from "@chakra-ui/react";
-import axios from "axios";
-import { authConfig } from "../../api";
-import { baseURL } from "../../api";
-import { useUserInfo } from "../../context/user-context";
 import { FIELD_NAMES, getInitialValues } from "./form-helper";
 import { useGloabalInfo } from "../../context/global-context";
+import { useDailyExpensesApi } from "../../api/hooks/use-daily-expenses-api";
+import { useCustomToast } from "../../hooks/use-toast";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 function useDailyExpensePage() {
-  axios.defaults.withCredentials = true;
-  const toast = useToast();
-  const { activeTab, fetchList, setFetchList, searchTerm, page, setPage } = useGloabalInfo();
-  const { user, token } = useUserInfo();
-  const [loading, setLoading] = useState(false);
-  const config = authConfig(token);
-  const [dailyExpenseList, setDailyExpenseList] = useState([]);
+  const { searchTerm, page, setPage } = useGloabalInfo();
+  const { showErrorToast, showSuccessToast, showLoadingToast, closeToast } =
+    useCustomToast();
+  const dailyExpensesApi = useDailyExpensesApi();
+  const queryClient = useQueryClient();
 
-  const getDailyExpenses = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await axios.get(`${baseURL}/daily-expenses?term=${searchTerm}&page=${page}`, {
-        headers: config.headers,
-      });
-      setDailyExpenseList(data?.data);
-      setLoading(false);
-    } catch (error) {
-      toast({
-        title: "Error Occurred!",
-        description: error.response.data.message,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
-      setLoading(false);
-    }
-  }, [config.headers, page, searchTerm, toast]);
+  const getDailyExpensesQuery = useQuery({
+    queryKey: ["daily-expenses", { term: searchTerm, page }],
+    queryFn: () =>
+      dailyExpensesApi.getDailyExpenses({ term: searchTerm, page }),
+    refetchInterval: false,
+    select: (data) => ({
+      data: data?.data || [],
+      pagination: data?.paging || {},
+    }),
+    onError: (error) => {
+      if (error.name === "CancelledError") return;
+      showErrorToast("Error Occurred!", error.response?.data?.message);
+    },
+  });
+
+  const createMutation = useMutation({
+    mutationFn: dailyExpensesApi.createDailyExpense,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["daily-expenses"] });
+      showSuccessToast("Daily Expense Created Successfully!");
+    },
+    onError: (error) => {
+      showErrorToast("Error Occurred!", error.response?.data?.message);
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: dailyExpensesApi.updateDailyExpense,
+    onSuccess: () => {
+      queryClient.invalidateQueries("daily-expenses");
+      showSuccessToast("Daily Expense Updated Successfully!");
+    },
+    onError: (error) => {
+      showErrorToast("Error Occurred!", error.response?.data?.message);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: dailyExpensesApi.deleteDailyExpense,
+    onSuccess: () => {
+      queryClient.invalidateQueries("daily-expenses");
+      showSuccessToast("Daily Expense Deleted Successfully!");
+      setPage(1);
+    },
+    onError: (error) => {
+      showErrorToast("Error Occurred!", error.response?.data?.message);
+    },
+  });
 
   const handleCreate = useCallback(
     async (values, actions, onClose) => {
-      toast({
-        title:"Saving...",
-        status:"loading",
-        duration: 500,
-        isClosable: true,
-        position: "bottom",
+      createMutation.mutate(values, {
+        onSuccess: () => {
+          actions.resetForm();
+          onClose(false);
+        },
       });
-      const { date, description, amount, entity } = values;
-      setLoading(true);
-      try {
-        await axios.post(
-          `${baseURL}/daily-expenses/create`,
-          {
-            date, description, amount, entity
-          },
-          {
-            headers: config.headers,
-          }
-        );
-        toast.close();
-        toast({
-          title: "Daily Expense Created Successfully!",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        setLoading(false);
-        actions.resetForm();
-        onClose(false);
-        setFetchList((prev) => prev + 1);
-      } catch (error) {
-        toast.close();
-        toast({
-          title: "Error Occured!",
-          description: error.response.data.message,
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        setLoading(false);
-      }
-    },
-    [config.headers, setFetchList, toast]
-  );
+    }, [createMutation]);
 
   const handleUpdateClick = useCallback(
     async ({ id, isUpdate, setIsUpdate, formik }) => {
+      showLoadingToast("Fetching daily expense details...");
       formik.resetForm({
         values: getInitialValues(),
       });
       formik.setFieldValue(`${FIELD_NAMES.DAILY_EXPENSE_ID}`, id);
-      const data = await axios.get(`${baseURL}/daily-expenses?daily_expense_id=${id}`, {
-        headers: config.headers,
-      });
-      const values = getInitialValues(data?.data);
+      const data = await dailyExpensesApi.getDailyExpenseById(id);
+      closeToast();
+      const values = getInitialValues(data);
       Object.entries(values).forEach(([key, value]) => {
         formik.setFieldValue(key, value);
       });
       setIsUpdate(!isUpdate);
-    },
-    [config.headers]
-  );
+    }, [closeToast, dailyExpensesApi, showLoadingToast]);
 
   const handleUpdate = useCallback(
     async (values, actions, setIsUpdate) => {
-      toast({
-        title:"Updating...",
-        status:"loading",
-        duration: 500,
-        isClosable: true,
-        position: "bottom",
+      updateMutation.mutate(values, {
+        onSuccess: () => {
+          actions.resetForm();
+          setIsUpdate(false);
+        },
       });
-      const { daily_expense_id, date, description, amount, entity } = values;
-      setLoading(true);
-      try {
-        await axios.put(
-          `${baseURL}/daily-expenses/update`,
-          {
-            daily_expense_id, date, description, amount, entity
-          },
-          {
-            headers: config.headers,
-          }
-        );
-        toast.close();
-        toast({
-          title: "Daily Expense Updated Successfully!",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        setLoading(false);
-        actions.resetForm();
-        setIsUpdate(false);
-        setFetchList((prev) => prev + 1);
-      } catch (error) {
-        toast.close();
-        toast({
-          title: "Error Occured!",
-          description: error.response.data.message,
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        setLoading(false);
-      }
-    },
-    [config.headers, setFetchList, toast]
-  );
-
-  const handleDelete = useCallback(
-    async (id) => {
-      toast({
-        title:"Deleting...",
-        status:"loading",
-        duration: 500,
-        isClosable: true,
-        position: "bottom",
-      });
-      setLoading(true);
-      try {
-        await axios.delete(`${baseURL}/daily-expenses/delete?daily_expense_id=${id}`, {
-          headers: config.headers,
-        });
-        toast.close();
-        toast({
-          title: "Daily Expense Deleted Successfully!",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        setLoading(false);
-        setPage(1);
-        setFetchList((prev) => prev + 1);
-      } catch (error) {
-        toast.close();
-        toast({
-          title: "Error Occured!",
-          description: error.response.data.message,
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        setLoading(false);
-      }
-    },
-    [config.headers, setFetchList, setPage, toast]
-  );
-
-  useEffect(() => {
-    if (activeTab === "Daily_Expenses") {
-      if (user !== null) {
-        getDailyExpenses();
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, searchTerm, page, fetchList, activeTab]);
+    }, [updateMutation]);
 
   return useMemo(() => {
     return {
-      loading,
-      dailyExpenseList,
+      loading:
+        getDailyExpensesQuery.isLoading ||
+        createMutation.isLoading ||
+        updateMutation.isLoading ||
+        deleteMutation.isLoading,
+      getDailyExpensesQuery,
       handleCreate,
       handleUpdateClick,
-      handleDelete,
-      getDailyExpenses,
       handleUpdate,
+      deleteMutation,
     };
-  }, [dailyExpenseList, getDailyExpenses, handleCreate, handleDelete, handleUpdate, handleUpdateClick, loading]);
+  }, [
+    createMutation.isLoading,
+    updateMutation.isLoading,
+    getDailyExpensesQuery,
+    handleCreate,
+    handleUpdate,
+    handleUpdateClick,
+    deleteMutation,
+  ]);
 }
 
-export const [DailyExpensePageProvider, useDailyExpensePageContext] = generateContext(useDailyExpensePage);
+export const [DailyExpensePageProvider, useDailyExpensePageContext] =
+  generateContext(useDailyExpensePage);

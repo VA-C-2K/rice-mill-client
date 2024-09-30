@@ -24,7 +24,7 @@ const FormContainer = (props) => {
         <Box py="3" px="1">
           <Flex alignItems="stretch" flexDirection={"row"}>
             <Stack width={"md"} style={{ marginRight: 20 }}>
-              <SearchField loading={loading} searchTerm={searchTerm} setSearchTerm={setSearchTerm} searchBy={"Phone No, Name"} />
+              <SearchField loading={loading} searchTerm={searchTerm} setSearchTerm={setSearchTerm} searchBy={"Phone No, Name, Role, Aadhar Card No"} />
             </Stack>
             <CustomButton
               onClick={() => {

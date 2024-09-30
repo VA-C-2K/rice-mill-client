@@ -8,14 +8,16 @@ import { DailyExpensePageProvider, useDailyExpensePageContext } from "./provider
 import withHOC from "../../utils/with-hoc";
 import TableSkeleton from "../../components/Skeleton";
 import { getFormattedDateforUI } from "../../utils/date";
+import { useFormikContext } from "formik";
 
 const DailyExpenseTable = (props) => {
-  const { dailyExpenseList, handleUpdateClick, handleDelete, loading } = useDailyExpensePageContext();
-  const { isUpdate, setIsUpdate, formik } = props;
+  const { getDailyExpensesQuery, handleUpdateClick, loading } = useDailyExpensePageContext();
+  const { isUpdate, setIsUpdate, handleDelete } = props;
+  const formik = useFormikContext();
   if (loading) {
     return <TableSkeleton NoRecordFound={false} />;
   }
-  if (dailyExpenseList?.dailyExpenses?.length === 0) {
+  if (getDailyExpensesQuery?.data?.data?.length === 0) {
     return <TableSkeleton NoRecordFound={true} />;
   }
   return (
@@ -62,7 +64,7 @@ const DailyExpenseTable = (props) => {
             </Tr>
           </Thead>
           <Tbody justifyContent={"center"}>
-            {dailyExpenseList?.dailyExpenses?.map((daily_expense, index) => (
+            {getDailyExpensesQuery?.data?.data?.map((daily_expense, index) => (
               <Tr key={daily_expense?._id}>
                 <Td>{index + 1}</Td>
                 <Td>

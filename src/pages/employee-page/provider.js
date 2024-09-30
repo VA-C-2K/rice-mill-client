@@ -10,7 +10,7 @@ export function useEmployeePage() {
   const { activeTab, searchTerm, page, setPage } = useGloabalInfo();
   const queryClient = useQueryClient();
   const employeeApi = useEmployeeApi();
-  const { showErrorToast, showSuccessToast } = useCustomToast();
+  const { showErrorToast, showSuccessToast, showLoadingToast, closeToast } = useCustomToast();
 
   const getEmployeesQuery = useQuery({
     queryKey: ["employees", { term: searchTerm, page }],
@@ -75,18 +75,20 @@ export function useEmployeePage() {
 
   const handleUpdateClick = useCallback(
     async ({ id, isUpdate, setIsUpdate, formik }) => {
+      showLoadingToast("Fetching employee details...");
       formik.resetForm({
         values: getInitialValues(),
       });
       formik.setFieldValue(`${FIELD_NAMES.EMP_ID}`, id);
       const data = await employeeApi.getEmployeeById(id);
+      closeToast();
       const values = getInitialValues(data);
       Object.entries(values).forEach(([key, value]) => {
         formik.setFieldValue(key, value);
       });
       setIsUpdate(!isUpdate);
     },
-    [employeeApi]
+    [closeToast, employeeApi, showLoadingToast]
   );
 
   const handleUpdate = useCallback(

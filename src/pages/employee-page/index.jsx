@@ -14,17 +14,17 @@ const Employee = () => {
   const { handleCreate, handleUpdate, deleteMutation } = useEmployeePageContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
-  const [currentEmpId, setCurrentEmpId] = useState(null);
+  const [currentId, setCurrentId] = useState(null);
 
   const confirmDelete = useCallback(() => {
-    deleteMutation.mutate(currentEmpId);
+    deleteMutation.mutate(currentId);
     setIsModalOpen(false);
-  }, [currentEmpId, deleteMutation]);
+  }, [currentId, deleteMutation]);
 
   const handleDelete = useCallback((id) => {
-    setCurrentEmpId(id);
+    setCurrentId(id);
     setIsModalOpen(true);
-  }, [setCurrentEmpId, setIsModalOpen]);
+  }, [setCurrentId, setIsModalOpen]);
 
   return (
     <Formik
@@ -40,10 +40,10 @@ const Employee = () => {
       validateOnMount={true}
       enableReinitialize={true}
     >
-      {(formik) => (
+      {() => (
         <>
-          <FormContainer isUpdate={isUpdate} setIsUpdate={setIsUpdate} formik={formik} isOpen={isOpen} onOpen={onOpen} onClose={onClose} />
-          <EmployeeTable isUpdate={isUpdate} setIsUpdate={setIsUpdate} formik={formik} handleDelete={handleDelete} />
+          <FormContainer isUpdate={isUpdate} setIsUpdate={setIsUpdate} isOpen={isOpen} onOpen={onOpen} onClose={onClose} />
+          <EmployeeTable isUpdate={isUpdate} setIsUpdate={setIsUpdate} handleDelete={handleDelete} />
           <ConfirmationModal
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}

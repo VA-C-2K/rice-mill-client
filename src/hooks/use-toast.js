@@ -43,6 +43,8 @@ export const useCustomToast = () => {
       showToast({ title, description, status: "loading" });
     }, [showToast, toast]),
 
+    closeToast: toast.closeAll,
+
     showCustomToast: showToast,
   };
 };
