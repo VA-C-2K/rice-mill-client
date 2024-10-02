@@ -1,229 +1,141 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import generateContext from "../../utils/generate-context";
-import { useToast } from "@chakra-ui/react";
-import axios from "axios";
-import { authConfig } from "../../api";
-import { baseURL } from "../../api";
 import { FIELD_NAMES, getInitialValues } from "./form-helper";
-import { useUserInfo } from "../../context/user-context";
 import { useGloabalInfo } from "../../context/global-context";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCustomerApi } from "../../api/hooks/use-customer-api";
+import { useCustomToast } from "../../hooks/use-toast";
 
 function useCustomerPage() {
-  axios.defaults.withCredentials = true;
-  const toast = useToast();
-  const { activeTab, fetchList, setFetchList, searchTerm, page, setPage } = useGloabalInfo();
-  const { user, token } = useUserInfo();
-  const [loading, setLoading] = useState(false);
-  const config = authConfig(token);
-  const [customerList, setCustomerList] = useState([]);
+  const customerApi = useCustomerApi();
+  const queryClient = useQueryClient();
+  const { activeTab, searchTerm, page, setPage } = useGloabalInfo();
+  const { showErrorToast, showSuccessToast, showLoadingToast, closeToast } =
+    useCustomToast();
 
-  const getCustomers = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await axios.get(`${baseURL}/customer?term=${searchTerm}&page=${page}`, {
-        headers: config.headers,
-      });
-      setCustomerList(data?.data);
-      setLoading(false);
-    } catch (error) {
-      toast({
-        title: "Error Occurred!",
-        description: error.response.data.message,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
-      setLoading(false);
-    }
-  }, [config.headers, page, searchTerm, toast]);
+  const getCustomersQuery = useQuery({
+    queryKey: ["customers", { term: searchTerm, page }],
+    queryFn: () => customerApi.getCustomers({ term: searchTerm, page }),
+    enabled: activeTab === "Customer",
+    refetchInterval: false,
+    select: (data) => ({
+      data: data?.data || [],
+      pagination: data?.paging || {},
+    }),
+    onError: (error) => {
+      if (error.name === "CancelledError") return;
+      showErrorToast("Error Occurred!", error.response?.data?.message);
+    },
+  });
+
+  const createMutation = useMutation({
+    mutationFn: customerApi.createCustomer,
+    onMutate: () => {
+      showLoadingToast("Saving...");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
+      showSuccessToast("Customer Created Successfully!");
+    },
+    onError: (error) => {
+      showErrorToast("Error Occurred!", error.response?.data?.message);
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: customerApi.updateCustomer,
+    onMutate: () => {
+      showLoadingToast("Updating...");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries("customers");
+      showSuccessToast("Customer Updated Successfully!");
+    },
+    onError: (error) => {
+      showErrorToast("Error Occurred!", error.response?.data?.message);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: customerApi.deleteCustomer,
+    onMutate: () => {
+      showLoadingToast("Deleting...");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries("customers");
+      showSuccessToast("Customer Deleted Successfully!");
+      setPage(1);
+    },
+    onError: (error) => {
+      showErrorToast("Error Occurred!", error.response?.data?.message);
+    },
+  });
 
   const handleCreate = useCallback(
     async (values, actions, onClose) => {
-      toast({
-        title:"Saving...",
-        status:"loading",
-        duration: 500,
-        isClosable: true,
-        position: "bottom",
+      createMutation.mutate(values, {
+        onSuccess: () => {
+          actions.resetForm();
+          onClose(false);
+        },
       });
-      const { address, first_name, gov_or_cust, last_name, phone_number } = values;
-      setLoading(true);
-      try {
-        await axios.post(
-          `${baseURL}/customer/create`,
-          {
-            address,
-            first_name,
-            gov_or_cust,
-            last_name,
-            phone_number,
-          },
-          {
-            headers: config.headers,
-          }
-        );
-        toast.close();
-        toast({
-          title: "Customer Created Successfully!",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        setLoading(false);
-        actions.resetForm();
-        onClose(false);
-        setFetchList((prev) => prev + 1);
-      } catch (error) {
-        toast.close();
-        toast({
-          title: "Error Occured!",
-          description: error.response.data.message,
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        setLoading(false);
-      }
     },
-    [config.headers, setFetchList, toast]
+    [createMutation]
   );
 
   const handleUpdateClick = useCallback(
     async ({ id, isUpdate, setIsUpdate, formik }) => {
+      showLoadingToast("Fetching customer details...");
       formik.resetForm({
         values: getInitialValues(),
       });
       formik.setFieldValue(`${FIELD_NAMES.CUST_ID}`, id);
-      const data = await axios.get(`${baseURL}/customer?cust_id=${id}`, {
-        headers: config.headers,
-      });
-      const values = getInitialValues(data?.data);
+      const data = await customerApi.getCustomerById(id);
+      const values = getInitialValues(data);
+      closeToast();
       Object.entries(values).forEach(([key, value]) => {
         formik.setFieldValue(key, value);
       });
       setIsUpdate(!isUpdate);
     },
-    [config.headers]
+    [closeToast, customerApi, showLoadingToast]
   );
 
   const handleUpdate = useCallback(
     async (values, actions, setIsUpdate) => {
-      toast({
-        title:"Updating...",
-        status:"loading",
-        duration: 500,
-        isClosable: true,
-        position: "bottom",
+      updateMutation.mutate(values, {
+        onSuccess: () => {
+          actions.resetForm();
+          setIsUpdate(false);
+        },
       });
-      const { cust_id, address, first_name, gov_or_cust, last_name, phone_number } = values;
-      setLoading(true);
-      try {
-        await axios.put(
-          `${baseURL}/customer/update`,
-          {
-            cust_id,
-            address,
-            first_name,
-            gov_or_cust,
-            last_name,
-            phone_number,
-          },
-          {
-            headers: config.headers,
-          }
-        );
-        toast.close();
-        toast({
-          title: "Customer Updated Successfully!",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        setLoading(false);
-        actions.resetForm();
-        setIsUpdate(false);
-        setFetchList((prev) => prev + 1);
-      } catch (error) {
-        toast.close();
-        toast({
-          title: "Error Occured!",
-          description: error.response.data.message,
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        setLoading(false);
-      }
     },
-    [config.headers, setFetchList, toast]
+    [updateMutation]
   );
-
-  const handleDelete = useCallback(
-    async (id) => {
-      toast({
-        title:"Deleting...",
-        status:"loading",
-        duration: 500,
-        isClosable: true,
-        position: "bottom",
-      });
-      setLoading(true);
-      try {
-        await axios.delete(`${baseURL}/customer/delete?cust_id=${id}`, {
-          headers: config.headers,
-        });
-        toast.close();
-        toast({
-          title: "Customer Deleted Successfully!",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        setLoading(false);
-        setPage(1);
-        setFetchList((prev) => prev + 1);
-      } catch (error) {
-        toast.close();
-        toast({
-          title: "Error Occured!",
-          description: error.response.data.message,
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        setLoading(false);
-      }
-    },
-    [config.headers, setFetchList, setPage, toast]
-  );
-
-  useEffect(() => {
-    if (activeTab === "Customer") {
-      if (user !== null) {
-        getCustomers();
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, searchTerm, page, fetchList, activeTab]);
 
   return useMemo(() => {
     return {
-      loading,
-      customerList,
+      loading:
+        getCustomersQuery.isLoading ||
+        createMutation.isLoading ||
+        updateMutation.isLoading ||
+        deleteMutation.isLoading,
+      getCustomersQuery,
       handleCreate,
       handleUpdateClick,
-      handleDelete,
-      getCustomers,
       handleUpdate,
+      deleteMutation,
     };
-  }, [customerList, getCustomers, handleCreate, handleDelete, handleUpdate, handleUpdateClick, loading]);
+  }, [
+    createMutation.isLoading,
+    deleteMutation,
+    getCustomersQuery,
+    handleCreate,
+    handleUpdate,
+    handleUpdateClick,
+    updateMutation.isLoading,
+  ]);
 }
 
-export const [CustomerPageProvider, useCustomerPageContext] = generateContext(useCustomerPage);
+export const [CustomerPageProvider, useCustomerPageContext] =
+  generateContext(useCustomerPage);

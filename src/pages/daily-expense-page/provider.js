@@ -7,7 +7,7 @@ import { useCustomToast } from "../../hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 function useDailyExpensePage() {
-  const { searchTerm, page, setPage } = useGloabalInfo();
+  const { searchTerm, page, setPage, activeTab } = useGloabalInfo();
   const { showErrorToast, showSuccessToast, showLoadingToast, closeToast } =
     useCustomToast();
   const dailyExpensesApi = useDailyExpensesApi();
@@ -15,6 +15,7 @@ function useDailyExpensePage() {
 
   const getDailyExpensesQuery = useQuery({
     queryKey: ["daily-expenses", { term: searchTerm, page }],
+    enabled: activeTab === "Daily_Expenses",
     queryFn: () =>
       dailyExpensesApi.getDailyExpenses({ term: searchTerm, page }),
     refetchInterval: false,

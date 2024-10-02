@@ -7,14 +7,16 @@ import { capitalizedString } from "../../utils/string-helper";
 import { useCustomerPageContext, CustomerPageProvider } from "./provider";
 import withHOC from "../../utils/with-hoc";
 import TableSkeleton from "../../components/Skeleton";
+import { useFormikContext } from "formik";
 
 const CustomerTable = (props) => {
-  const { customerList, handleUpdateClick, handleDelete, loading } = useCustomerPageContext();
-  const { isUpdate, setIsUpdate, formik } = props;
+  const { getCustomersQuery, handleUpdateClick, loading } = useCustomerPageContext();
+  const { isUpdate, setIsUpdate, handleDelete } = props;
+  const formik = useFormikContext();
   if (loading) {
     return <TableSkeleton NoRecordFound={false} />;
   }
-  if (customerList?.customers?.length === 0) {
+  if (getCustomersQuery?.data?.data?.length === 0) {
     return <TableSkeleton NoRecordFound={true} />;
   }
   return (
@@ -61,7 +63,7 @@ const CustomerTable = (props) => {
             </Tr>
           </Thead>
           <Tbody justifyContent={"center"}>
-            {customerList?.customers?.map((customer, index) => (
+            {getCustomersQuery?.data?.data?.map((customer, index) => (
               <Tr key={customer._id}>
                 <Td>{index + 1}</Td>
                 <Td>
